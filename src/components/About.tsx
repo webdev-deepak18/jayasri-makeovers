@@ -75,11 +75,11 @@ export default function About() {
 
           <div className="flex flex-col gap-3 w-full max-w-xs mx-auto">
             <a
-              href="phonepe://pay?pa=8867052945@ybl&pn=Jayasri%20Makeovers&cu=INR"
+              href="phonepe://"
               className="w-full flex items-center justify-center gap-2 bg-[#5f259f] hover:bg-[#4a1a80] active:scale-95 text-white font-poppins font-semibold px-4 py-3.5 rounded-xl shadow-md transition-all text-base"
             >
               <span className="text-xl">⚡</span>
-              Pay via PhonePe
+              Open PhonePe
             </a>
             <div className="flex gap-3 w-full">
               <button
@@ -108,7 +108,7 @@ export default function About() {
               <div className="w-8 h-8 rounded-full bg-[#5f259f] text-white text-sm font-bold flex items-center justify-center shrink-0">1</div>
               <div>
                 <p className="text-sm font-semibold text-neutral-800">Open PhonePe</p>
-                <p className="text-xs text-neutral-500 mt-0.5">Tap the button above — app opens with details pre-filled.</p>
+                <p className="text-xs text-neutral-500 mt-0.5">Tap the button above to open the app, then search by UPI ID or number below.</p>
               </div>
             </div>
 
