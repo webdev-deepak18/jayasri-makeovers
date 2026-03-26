@@ -7,7 +7,7 @@ export default function Navbar() {
 
   return (
     <nav className="flex items-center justify-between px-6 py-4 bg-brand-light/95 backdrop-blur-md sticky top-0 z-50 border-b border-brand-secondary/20">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center">
         <h1 className="font-playfair font-bold text-xl text-brand-primary tracking-wide">
           Jayasri <span className="text-brand-secondary">Makeovers</span>
         </h1>

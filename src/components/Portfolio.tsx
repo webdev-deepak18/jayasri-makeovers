@@ -30,6 +30,7 @@ const images = [
 export default function Portfolio() {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<Category>("all");
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const categories: { id: Category; labelKey: string }[] = [
     { id: "all", labelKey: "portfolio.all" },
@@ -44,8 +45,23 @@ export default function Portfolio() {
 
   const filteredImages = activeTab === "all" ? images : images.filter(img => img.category === activeTab);
 
+  const openLightbox = (index: number) => setLightboxIndex(index);
+  const closeLightbox = () => setLightboxIndex(null);
+  const nextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (lightboxIndex !== null) {
+      setLightboxIndex((lightboxIndex + 1) % filteredImages.length);
+    }
+  };
+  const prevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (lightboxIndex !== null) {
+      setLightboxIndex((lightboxIndex - 1 + filteredImages.length) % filteredImages.length);
+    }
+  };
+
   return (
-    <section className="py-12 bg-white" id="portfolio">
+    <section className="py-12 bg-white relative" id="portfolio">
       <div className="text-center mb-8 px-6">
         <h3 className="font-playfair text-3xl font-bold text-brand-primary">{t("portfolio.title")}</h3>
         <div className="w-16 h-1 bg-brand-secondary mx-auto mt-4 rounded-full"></div>
@@ -72,7 +88,11 @@ export default function Portfolio() {
       {/* Masonry-style Grid (CSS Columns) */}
       <div className="px-6 columns-2 gap-4 space-y-4">
         {filteredImages.map((img, idx) => (
-          <div key={`${img.src}-${idx}`} className="relative w-full rounded-2xl overflow-hidden shadow-sm inline-block group">
+          <div 
+            key={`${img.src}-${idx}`} 
+            className="relative w-full rounded-2xl overflow-hidden shadow-sm inline-block group cursor-pointer"
+            onClick={() => openLightbox(idx)}
+          >
             <Image
               src={img.src}
               alt={`Jayasri Makeovers ${img.category}`}
@@ -92,6 +112,51 @@ export default function Portfolio() {
           </div>
         ))}
       </div>
+
+      {/* Lightbox Modal */}
+      {lightboxIndex !== null && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center touch-none backdrop-blur-md"
+          onClick={closeLightbox}
+        >
+          {/* Close Button */}
+          <button 
+            className="absolute top-6 right-6 text-white p-2 z-[110] bg-black/40 rounded-full hover:bg-white/20 transition-colors"
+            onClick={(e) => { e.stopPropagation(); closeLightbox(); }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+          
+          {/* Prev Button */}
+          <button 
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-white p-3 z-[110] bg-black/40 rounded-full hover:bg-white/20 transition-colors"
+            onClick={prevImage}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          
+          {/* Main Image Container */}
+          <div className="relative w-full max-w-md h-full px-4 flex items-center justify-center pointer-events-none">
+            <div className="relative w-full h-[85vh]">
+              <Image
+                src={filteredImages[lightboxIndex].src}
+                alt={`Jayasri Makeovers ${filteredImages[lightboxIndex].category} full size`}
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+          </div>
+
+          {/* Next Button */}
+          <button 
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-white p-3 z-[110] bg-black/40 rounded-full hover:bg-white/20 transition-colors"
+            onClick={nextImage}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+      )}
     </section>
   );
 }

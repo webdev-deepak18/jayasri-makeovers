@@ -2,9 +2,17 @@
 
 import { useLanguage } from "@/context/LanguageContext";
 import Image from "next/image";
+import { useState } from "react";
 
 export default function About() {
   const { t } = useLanguage();
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText("8867052945@ybl");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <section className="py-12 px-6 bg-brand-light" id="about">
@@ -35,10 +43,7 @@ export default function About() {
             <span className="text-2xl mt-0.5">🏡</span>
             <p className="text-sm text-neutral-600 leading-relaxed font-medium">{t("about.demo")}</p>
           </div>
-          <div className="flex gap-4 items-start bg-neutral-50 p-4 rounded-2xl border border-neutral-100">
-            <span className="text-2xl mt-0.5">🚗</span>
-            <p className="text-sm text-neutral-600 leading-relaxed font-medium">{t("about.travel")}</p>
-          </div>
+          {/* Travel charges moved to Pricing.tsx */}
           <div className="flex gap-4 items-start bg-neutral-50 p-4 rounded-2xl border border-neutral-100">
             <span className="text-2xl mt-0.5">📅</span>
             <p className="text-sm text-neutral-600 leading-relaxed font-medium">{t("about.advance")}</p>
@@ -68,16 +73,25 @@ export default function About() {
           </p>
           <p className="text-xs text-neutral-500 mb-5">100% Secure Payment via UPI</p>
 
-          {/* Pay Now — opens PhonePe app with number pre-filled */}
-          <a
-            href="upi://pay?pa=8867052945@ybl&pn=Jayasri%20Makeovers&cu=INR"
-            className="inline-flex items-center gap-2 bg-[#5f259f] hover:bg-[#4a1a80] active:scale-95 text-white font-poppins font-semibold px-8 py-3 rounded-full shadow-md transition-all text-base"
-          >
-            <span className="text-xl">💜</span>
-            Pay Now via PhonePe
-          </a>
-          <p className="text-[11px] text-neutral-400 mt-2">
-            Opens PhonePe app automatically
+          <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs mx-auto">
+            <button
+              onClick={handleCopy}
+              className="flex-1 flex items-center justify-center gap-2 bg-[#5f259f] hover:bg-[#4a1a80] active:scale-95 text-white font-poppins font-semibold px-4 py-3 rounded-xl shadow-md transition-all text-sm"
+            >
+              <span className="text-lg">{copied ? "✅" : "📋"}</span>
+              {copied ? "ID Copied" : "Copy UPI ID"}
+            </button>
+            <a
+              href="/images/jayasri-phonepe-qr-code.png"
+              download="Jayasri_Makeovers_QR.png"
+              className="flex-1 flex items-center justify-center gap-2 bg-neutral-100 border border-neutral-200 hover:bg-neutral-200 active:scale-95 text-neutral-700 font-poppins font-semibold px-4 py-3 rounded-xl shadow-sm transition-all text-sm"
+            >
+              <span className="text-lg">⬇️</span>
+              Save QR
+            </a>
+          </div>
+          <p className="text-[11px] text-neutral-400 mt-3">
+            Open PhonePe &gt; Paste ID or Scan Gallery Image
           </p>
         </div>
 

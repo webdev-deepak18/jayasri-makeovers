@@ -54,6 +54,15 @@ export default function Pricing() {
         </div>
 
       </div>
+
+      {/* Travel Notice (Moved to bottom) */}
+      <div className="bg-brand-secondary/10 border border-brand-secondary/30 rounded-2xl p-4 mt-8 flex items-start gap-3 shadow-sm text-left">
+        <span className="text-xl">🚗</span>
+        <p className="text-sm text-neutral-700 font-medium leading-relaxed">
+          <span className="font-bold text-brand-primary">Travel Notice: </span>
+          {t("about.travel")}
+        </p>
+      </div>
     </section>
   );
 }

@@ -1,3 +1,5 @@
+import StickyActionBar from "../StickyActionBar";
+
 export default function MobileContainer({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-neutral-100 flex justify-center w-full font-sans text-neutral-900">
@@ -7,6 +9,7 @@ export default function MobileContainer({ children }: { children: React.ReactNod
       */}
       <div className="w-full max-w-md bg-white shadow-2xl relative min-h-screen overflow-x-hidden flex flex-col">
         {children}
+        <StickyActionBar />
       </div>
     </div>
   );
