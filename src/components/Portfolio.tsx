@@ -1,7 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/context/LanguageContext";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 
 type Category = "all" | "bridal" | "hair" | "hd" | "engagement" | "simple" | "babyShower" | "reception";
@@ -32,6 +32,10 @@ export default function Portfolio() {
   const [activeTab, setActiveTab] = useState<Category>("all");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
+  // Touch swipe tracking
+  const touchStartX = useRef<number>(0);
+  const touchStartY = useRef<number>(0);
+
   const categories: { id: Category; labelKey: string }[] = [
     { id: "all", labelKey: "portfolio.all" },
     { id: "bridal", labelKey: "portfolio.bridal" },
@@ -47,16 +51,39 @@ export default function Portfolio() {
 
   const openLightbox = (index: number) => setLightboxIndex(index);
   const closeLightbox = () => setLightboxIndex(null);
-  const nextImage = (e: React.MouseEvent) => {
-    e.stopPropagation();
+
+  const goNext = () => {
     if (lightboxIndex !== null) {
       setLightboxIndex((lightboxIndex + 1) % filteredImages.length);
     }
   };
-  const prevImage = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const goPrev = () => {
     if (lightboxIndex !== null) {
       setLightboxIndex((lightboxIndex - 1 + filteredImages.length) % filteredImages.length);
+    }
+  };
+
+  // Arrow click wrappers (prevent closing lightbox on click through)
+  const nextImage = (e: React.MouseEvent) => { e.stopPropagation(); goNext(); };
+  const prevImage = (e: React.MouseEvent) => { e.stopPropagation(); goPrev(); };
+
+  // Touch handlers for swipe navigation
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    const deltaY = e.changedTouches[0].clientY - touchStartY.current;
+
+    // Only process as a horizontal swipe if it's clearly more horizontal than vertical
+    if (Math.abs(deltaX) < 40 || Math.abs(deltaX) < Math.abs(deltaY)) return;
+
+    if (deltaX < 0) {
+      goNext(); // Swipe left = next image
+    } else {
+      goPrev(); // Swipe right = prev image
     }
   };
 
@@ -116,8 +143,10 @@ export default function Portfolio() {
       {/* Lightbox Modal */}
       {lightboxIndex !== null && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center touch-none backdrop-blur-md"
+          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center backdrop-blur-md"
           onClick={closeLightbox}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
         >
           {/* Close Button */}
           <button 
@@ -126,10 +155,31 @@ export default function Portfolio() {
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
+
+          {/* Swipe hint indicator — shows briefly then fades */}
+          <div className="absolute bottom-8 left-0 right-0 flex items-center justify-center gap-3 text-white/50 text-xs pointer-events-none select-none">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            <span>Swipe to browse</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          </div>
+
+          {/* Position indicator dots */}
+          <div className="absolute top-6 left-0 right-0 flex items-center justify-center gap-1.5 pointer-events-none">
+            {filteredImages.map((_, idx) => (
+              <div
+                key={idx}
+                className={`rounded-full transition-all duration-300 ${
+                  idx === lightboxIndex
+                    ? "w-4 h-2 bg-white"
+                    : "w-2 h-2 bg-white/30"
+                }`}
+              />
+            ))}
+          </div>
           
-          {/* Prev Button */}
+          {/* Prev Button (desktop fallback) */}
           <button 
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-white p-3 z-[110] bg-black/40 rounded-full hover:bg-white/20 transition-colors"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-white p-3 z-[110] bg-black/40 rounded-full hover:bg-white/20 transition-colors md:flex hidden"
             onClick={prevImage}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
@@ -158,9 +208,9 @@ export default function Portfolio() {
             </div>
           </div>
 
-          {/* Next Button */}
+          {/* Next Button (desktop fallback) */}
           <button 
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-white p-3 z-[110] bg-black/40 rounded-full hover:bg-white/20 transition-colors"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-white p-3 z-[110] bg-black/40 rounded-full hover:bg-white/20 transition-colors md:flex hidden"
             onClick={nextImage}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>

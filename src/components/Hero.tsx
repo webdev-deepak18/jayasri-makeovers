@@ -33,7 +33,7 @@ export default function Hero() {
         </h2>
         
         <a 
-          href="https://wa.me/918867052945" 
+          href="https://wa.me/918867052945?text=Hi%20Jayasri!%20I%20found%20you%20on%20Instagram%20and%20would%20love%20to%20book%20a%20makeover.%20Can%20you%20share%20your%20availability%20and%20package%20details%3F%20%F0%9F%92%84" 
           target="_blank" 
           rel="noopener noreferrer"
           className="flex items-center justify-center gap-2 bg-[#25D366] text-white px-8 py-3.5 rounded-full font-bold shadow-lg shadow-black/20 hover:scale-105 active:scale-95 transition-all w-full max-w-[280px]"

@@ -46,7 +46,11 @@ export default function About() {
           {/* Travel charges moved to Pricing.tsx */}
           <div className="flex gap-4 items-start bg-neutral-50 p-4 rounded-2xl border border-neutral-100">
             <span className="text-2xl mt-0.5">📅</span>
-            <p className="text-sm text-neutral-600 leading-relaxed font-medium">{t("about.advance")}</p>
+            <p className="text-sm text-neutral-600 leading-relaxed font-medium">
+              Secure your date with a{" "}
+              <span className="font-bold text-brand-primary">50% advance</span>{" "}
+              — your slot is reserved exclusively for you.
+            </p>
           </div>
         </div>
         
@@ -75,7 +79,7 @@ export default function About() {
 
           <div className="flex flex-col gap-3 w-full max-w-xs mx-auto">
             <a
-              href="phonepe://"
+              href="phonepe://pay?pa=8867052945%40ybl&pn=Jayashree%20C&cu=INR"
               className="w-full flex items-center justify-center gap-2 bg-[#5f259f] hover:bg-[#4a1a80] active:scale-95 text-white font-poppins font-semibold px-4 py-3.5 rounded-xl shadow-md transition-all text-base"
             >
               <span className="text-xl">⚡</span>

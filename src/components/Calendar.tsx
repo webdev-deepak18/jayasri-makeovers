@@ -6,15 +6,25 @@ import { useState } from "react";
 // Simple JS Config for booked dates
 const BOOKED_DATES = ["2026-04-11", "2026-04-12"];
 
+/** Returns today's date as YYYY-MM-DD string in IST, regardless of visitor's device locale */
+function getTodayIST(): Date {
+  // toLocaleDateString with timeZone gives us the IST date string, which we parse back into a midnight Date
+  const istDateStr = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" }); // "YYYY-MM-DD"
+  const [year, month, day] = istDateStr.split("-").map(Number);
+  const d = new Date(year, month - 1, day);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
 export default function Calendar() {
   const { t } = useLanguage();
 
-  // Generate the current month + next 2 months
+  // Generate the current month + next 2 months based on IST
   const getMonths = () => {
     const months = [];
-    const today = new Date();
+    const todayIST = getTodayIST();
     for (let i = 0; i < 3; i++) {
-      const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
+      const d = new Date(todayIST.getFullYear(), todayIST.getMonth() + i, 1);
       months.push(d);
     }
     return months;
@@ -41,14 +51,15 @@ export default function Calendar() {
     <div key={`blank-${i}`} className="p-2" />
   ));
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = getTodayIST();
 
   const days = Array.from({ length: daysInMonth }).map((_, i) => {
     const date = i + 1;
     const dateStr = `${yearNum}-${String(monthNum + 1).padStart(2, "0")}-${String(date).padStart(2, "0")}`;
     const isBooked = BOOKED_DATES.includes(dateStr);
-    const isPast = new Date(dateStr) < today;
+    // Compare against IST midnight — a date is past if it is strictly before today
+    const thisDate = new Date(yearNum, monthNum, date);
+    const isPast = thisDate < today;
 
     let bgClass = "";
     if (isPast) {
