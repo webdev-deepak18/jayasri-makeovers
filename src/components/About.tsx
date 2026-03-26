@@ -73,26 +73,77 @@ export default function About() {
           </p>
           <p className="text-xs text-neutral-500 mb-5">100% Secure Payment via UPI</p>
 
-          <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs mx-auto">
-            <button
-              onClick={handleCopy}
-              className="flex-1 flex items-center justify-center gap-2 bg-[#5f259f] hover:bg-[#4a1a80] active:scale-95 text-white font-poppins font-semibold px-4 py-3 rounded-xl shadow-md transition-all text-sm"
-            >
-              <span className="text-lg">{copied ? "✅" : "📋"}</span>
-              {copied ? "ID Copied" : "Copy UPI ID"}
-            </button>
+          <div className="flex flex-col gap-3 w-full max-w-xs mx-auto">
             <a
-              href="/images/jayasri-phonepe-qr-code.png"
-              download="Jayasri_Makeovers_QR.png"
-              className="flex-1 flex items-center justify-center gap-2 bg-neutral-100 border border-neutral-200 hover:bg-neutral-200 active:scale-95 text-neutral-700 font-poppins font-semibold px-4 py-3 rounded-xl shadow-sm transition-all text-sm"
+              href="phonepe://pay?pa=8867052945@ybl&pn=Jayasri%20Makeovers&cu=INR"
+              className="w-full flex items-center justify-center gap-2 bg-[#5f259f] hover:bg-[#4a1a80] active:scale-95 text-white font-poppins font-semibold px-4 py-3.5 rounded-xl shadow-md transition-all text-base"
             >
-              <span className="text-lg">⬇️</span>
-              Save QR
+              <span className="text-xl">⚡</span>
+              Pay via PhonePe
             </a>
+            <div className="flex gap-3 w-full">
+              <button
+                onClick={handleCopy}
+                className="flex-1 flex items-center justify-center gap-1.5 bg-neutral-100 border border-neutral-200 hover:bg-neutral-200 active:scale-95 text-neutral-700 font-poppins font-semibold px-3 py-2.5 rounded-xl shadow-sm transition-all text-xs"
+              >
+                <span className="text-sm">{copied ? "✅" : "📋"}</span>
+                {copied ? "ID Copied" : "Copy ID"}
+              </button>
+              <a
+                href="/images/jayasri-phonepe-qr-code.png"
+                download="Jayasri_Makeovers_QR.png"
+                className="flex-1 flex items-center justify-center gap-1.5 bg-neutral-100 border border-neutral-200 hover:bg-neutral-200 active:scale-95 text-neutral-700 font-poppins font-semibold px-3 py-2.5 rounded-xl shadow-sm transition-all text-xs"
+              >
+                <span className="text-sm">⬇️</span>
+                Save QR
+              </a>
+            </div>
           </div>
-          <p className="text-[11px] text-neutral-400 mt-3">
-            Open PhonePe &gt; Paste ID or Scan Gallery Image
-          </p>
+
+          <div className="mt-5 w-full text-left space-y-2">
+            <p className="text-xs text-neutral-400 uppercase tracking-widest font-semibold px-1 mb-3">How to pay</p>
+
+            {/* Step 1 */}
+            <div className="flex items-center gap-3 bg-[#5f259f]/5 border border-[#5f259f]/15 rounded-2xl p-3.5">
+              <div className="w-8 h-8 rounded-full bg-[#5f259f] text-white text-sm font-bold flex items-center justify-center shrink-0">1</div>
+              <div>
+                <p className="text-sm font-semibold text-neutral-800">Open PhonePe</p>
+                <p className="text-xs text-neutral-500 mt-0.5">Tap the button above — app opens with details pre-filled.</p>
+              </div>
+            </div>
+
+            {/* Step 2 */}
+            <div className="flex items-start gap-3 bg-neutral-50 border border-neutral-100 rounded-2xl p-3.5">
+              <div className="w-8 h-8 rounded-full bg-neutral-200 text-neutral-700 text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">2</div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-neutral-800">Use GPay / Any UPI</p>
+                <p className="text-xs text-neutral-500 mt-0.5 mb-2">Search by UPI ID, number, or scan QR.</p>
+                <div className="bg-white rounded-xl border border-neutral-100 divide-y divide-neutral-100 text-xs overflow-hidden shadow-sm">
+                  <div className="flex justify-between items-center px-3 py-2">
+                    <span className="text-neutral-500">UPI ID</span>
+                    <span className="font-semibold text-[#5f259f] tracking-wide">8867052945@ybl</span>
+                  </div>
+                  <div className="flex justify-between items-center px-3 py-2">
+                    <span className="text-neutral-500">Number</span>
+                    <span className="font-semibold text-neutral-800 tracking-wide">88670 52945</span>
+                  </div>
+                  <div className="flex justify-between items-center px-3 py-2">
+                    <span className="text-neutral-500">Name</span>
+                    <span className="font-semibold text-neutral-800">Jayashree C</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div className="flex items-center gap-3 bg-neutral-50 border border-neutral-100 rounded-2xl p-3.5">
+              <div className="w-8 h-8 rounded-full bg-neutral-200 text-neutral-700 text-sm font-bold flex items-center justify-center shrink-0">3</div>
+              <div>
+                <p className="text-sm font-semibold text-neutral-800">Scan from Gallery</p>
+                <p className="text-xs text-neutral-500 mt-0.5">Save QR → open your app → Scan from photos.</p>
+              </div>
+            </div>
+          </div>
         </div>
 
       </div>

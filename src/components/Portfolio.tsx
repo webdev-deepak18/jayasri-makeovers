@@ -137,14 +137,24 @@ export default function Portfolio() {
           
           {/* Main Image Container */}
           <div className="relative w-full max-w-md h-full px-4 flex items-center justify-center pointer-events-none">
-            <div className="relative w-full h-[85vh]">
+            <div 
+              className="relative w-full h-[85vh] pointer-events-auto"
+              onContextMenu={(e) => e.preventDefault()}
+            >
               <Image
                 src={filteredImages[lightboxIndex].src}
                 alt={`Jayasri Makeovers ${filteredImages[lightboxIndex].category} full size`}
                 fill
-                className="object-contain"
+                className="object-contain pointer-events-none select-none protect-image"
                 priority
+                draggable={false}
               />
+              {/* Lightbox Watermark */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-30 select-none pointer-events-none">
+                <p className="text-white text-2xl sm:text-4xl font-bold -rotate-45 tracking-widest uppercase drop-shadow-lg whitespace-nowrap">
+                  Jayasri Makeovers
+                </p>
+              </div>
             </div>
           </div>
 
