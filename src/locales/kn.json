@@ -1,0 +1,47 @@
+{
+  "nav.services": "ಸೇವೆಗಳು",
+  "nav.portfolio": "ಪೋರ್ಟ್ಫೋಲಿಯೋ",
+  "nav.about": "ನಮ್ಮ ಬಗ್ಗೆ",
+  "nav.book": "ಬುಕ್ ಮಾಡಿ",
+  
+  "hero.tagline": "ಬೆಂಗಳೂರಿನ ಹೃದಯಭಾಗದಿಂದ ಅಧಿಕೃತ ಮೇಕಪ್ ಕಲೆ ನಿಮಗೆ.",
+  "hero.bookNow": "WhatsApp ನಲ್ಲಿ ಬುಕ್ ಮಾಡಿ",
+  
+  "pricing.title": "ಬೆಲೆ ಮತ್ತು ಪ್ಯಾಕೇಜ್‌ಗಳು",
+  "pricing.hdBridal": "ಎಚ್ಡಿ ಬ್ರೈಡಲ್ ಮೇಕಪ್ [HD Bridal]",
+  "pricing.hdBridalInclude": "ಎಚ್ಡಿ ಮೇಕಪ್ + ಹೇರ್ ಸ್ಟೈಲ್ + ಸೀರೆ ಉಡಿಸುವಿಕೆ",
+  "pricing.engagement": "ಎಂಗೇಜ್ಮೆಂಟ್ ಮೇಕಪ್",
+  "pricing.engagementInclude": "ಸೆಮಿ-ಎಚ್ಡಿ ಮೇಕಪ್ + ಹೇರ್ ಸ್ಟೈಲ್ + ಸೀರೆ ಉಡಿಸುವಿಕೆ",
+  "pricing.simple": "ಸಿಂಪಲ್ ಮೇಕಪ್",
+  "pricing.simpleInclude": "ಸಾಧಾರಣ ಮೇಕಪ್ + ಹೇರ್ ಸ್ಟೈಲ್ + ಸೀರೆ ಉಡಿಸುವಿಕೆ",
+  "pricing.popular": "ಜನಪ್ರಿಯ",
+  "pricing.sareeHair": "ಸೀರೆ ಮತ್ತು ಹೇರ್ ಸ್ಟೈಲ್",
+  "pricing.sareeHairInclude": "ಸೀರೆ ಉಡಿಸುವುದು + ಕೇಶವಿನ್ಯಾಸ ಮಾತ್ರ",
+  
+  "portfolio.title": "ನನ್ನ ಕೆಲಸಗಳು",
+  "portfolio.all": "ಎಲ್ಲಾ",
+  "portfolio.bridal": "ಮದುವೆ ಕಲೆ (Bridal)",
+  "portfolio.hair": "ಕೇಶವಿನ್ಯಾಸ",
+  "portfolio.hd": "ಎಚ್ಡಿ ಮೇಕಪ್",
+  "portfolio.engagement": "ಎಂಗೇಜ್ಮೆಂಟ್",
+  "portfolio.simple": "ಸಿಂಪಲ್",
+  "portfolio.babyShower": "ಸೀಮಂತ",
+  "portfolio.reception": "ರಿಸೆಪ್ಷನ್",
+  
+  "calendar.title": "ಲಭ್ಯತೆ (ಕ್ಯಾಲೆಂಡರ್)",
+  "calendar.available": "ಲಭ್ಯವಿದೆ",
+  "calendar.booked": "ಬುಕ್ ಆಗಿದೆ",
+  
+  "testimonials.title": "ಸಂತೋಷದ ಗ್ರಾಹಕರು",
+  
+  "about.title": "ಜಯಶ್ರೀ ಬಗ್ಗೆ",
+  "about.certified": "ISO ದೃಢೀಕೃತ ಮೇಕಪ್ ಆರ್ಟಿಸ್ಟ್",
+  "about.demo": "ನನ್ನ ಮನೆಯಲ್ಲಿ ಉಚಿತ ಟ್ರಯಲ್ ಡೆಮೊ ಲಭ್ಯವಿದೆ (ಮಹಿಳೆಯರಿಗೆ ಮಾತ್ರ).",
+  "about.travel": "ಬೆಂಗಳೂರಿನಾದ್ಯಂತ ಪ್ರಯಾಣ ಲಭ್ಯವಿದೆ (ಪ್ರಯಾಣ ಶುಲ್ಕ ಅಂದಾಜು ₹500 ಗ್ರಾಹಕರು ಭರಿಸಬೇಕಾಗುತ್ತದೆ).",
+  "about.advance": "50% ಮುಂಗಡ ನೀಡಿ ನಿಮ್ಮ ದಿನಾಂಕವನ್ನು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ - ನಿಮ್ಮ ಸ್ಲಾಟ್ ನಿಮಗಾಗಿ ಮಾತ್ರ ಕಾಯ್ದಿರಿಸಲಾಗುವುದು.",
+  "about.scanToPay": "ಮುಂಗಡ ಪಾವತಿಸಲು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ",
+  "about.phonePe": "PhonePe: 88670 52945",
+  
+  "footer.rights": "ಎಲ್ಲಾ ಹಕ್ಕುಗಳನ್ನು ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ.",
+  "footer.instagram": "Instagram ನಲ್ಲಿ ಫಾಲೋ ಮಾಡಿ"
+}

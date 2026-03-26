@@ -1,0 +1,47 @@
+{
+  "nav.services": "Services",
+  "nav.portfolio": "Portfolio",
+  "nav.about": "About",
+  "nav.book": "Book Now",
+  
+  "hero.tagline": "Certified makeup artistry, from Bangalore's heart to yours.",
+  "hero.bookNow": "Book on WhatsApp",
+  
+  "pricing.title": "Pricing & Packages",
+  "pricing.hdBridal": "HD Bridal Makeover",
+  "pricing.hdBridalInclude": "HD Makeup + Hairstyle + Saree Draping",
+  "pricing.engagement": "Engagement Makeover",
+  "pricing.engagementInclude": "Semi-HD Makeup + Hairstyle + Saree Draping",
+  "pricing.simple": "Simple Makeover",
+  "pricing.simpleInclude": "Simple Makeup + Hairstyle + Saree Draping",
+  "pricing.popular": "Popular",
+  "pricing.sareeHair": "Saree & Hairstyle",
+  "pricing.sareeHairInclude": "Saree Draping + Hairstyle only",
+  
+  "portfolio.title": "My Work",
+  "portfolio.all": "All",
+  "portfolio.bridal": "Bridal",
+  "portfolio.hair": "Hairstyles",
+  "portfolio.hd": "HD Makeup",
+  "portfolio.engagement": "Engagement",
+  "portfolio.simple": "Simple",
+  "portfolio.babyShower": "Baby Shower",
+  "portfolio.reception": "Reception",
+  
+  "calendar.title": "Availability Calendar",
+  "calendar.available": "Available",
+  "calendar.booked": "Booked",
+  
+  "testimonials.title": "Happy Clients",
+  
+  "about.title": "About Jayasri",
+  "about.certified": "ISO Certified Makeup Artist",
+  "about.demo": "Free trial demos are available at my home (ladies only).",
+  "about.travel": "Travel available across Bangalore (client bears travel charges, approx. ₹500 depending on distance).",
+  "about.advance": "Secure your date with a 50% advance — your slot is reserved exclusively for you.",
+  "about.scanToPay": "Scan to Pay Advance",
+  "about.phonePe": "PhonePe: 88670 52945",
+  
+  "footer.rights": "All rights reserved.",
+  "footer.instagram": "Follow on Instagram"
+}
