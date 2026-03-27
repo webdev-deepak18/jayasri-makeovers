@@ -143,7 +143,7 @@ export default function Portfolio() {
       {/* Lightbox Modal */}
       {lightboxIndex !== null && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center backdrop-blur-md"
+          className="fixed inset-y-0 w-full max-w-md left-1/2 -translate-x-1/2 z-[100] bg-black/95 flex items-center justify-center backdrop-blur-md"
           onClick={closeLightbox}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}

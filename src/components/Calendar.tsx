@@ -1,7 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/context/LanguageContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // Simple JS Config for booked dates
 const BOOKED_DATES = ["2026-04-11", "2026-04-12"];
@@ -19,12 +19,38 @@ function getTodayIST(): Date {
 export default function Calendar() {
   const { t } = useLanguage();
 
+  const [today, setToday] = useState<Date | null>(null);
+  const [activeMonth, setActiveMonth] = useState(0); // 0, 1, or 2
+
+  useEffect(() => {
+    setToday(getTodayIST());
+  }, []);
+
+  if (!today) {
+    return (
+      <section className="py-12 px-6 bg-brand-light" id="availability">
+        <div className="text-center mb-8">
+          <h3 className="font-playfair text-3xl font-bold text-brand-primary">
+            {t("calendar.title")}
+          </h3>
+          <div className="w-16 h-1 bg-brand-secondary mx-auto mt-4 rounded-full" />
+        </div>
+        <div className="min-h-[400px] flex items-center justify-center">
+          <div className="animate-pulse flex space-x-2">
+            <div className="h-3 w-3 bg-brand-secondary/50 rounded-full"></div>
+            <div className="h-3 w-3 bg-brand-secondary/50 rounded-full"></div>
+            <div className="h-3 w-3 bg-brand-secondary/50 rounded-full"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   // Generate the current month + next 2 months based on IST
   const getMonths = () => {
     const months = [];
-    const todayIST = getTodayIST();
     for (let i = 0; i < 3; i++) {
-      const d = new Date(todayIST.getFullYear(), todayIST.getMonth() + i, 1);
+      const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
       months.push(d);
     }
     return months;
@@ -39,8 +65,6 @@ export default function Calendar() {
   const months = getMonths();
   const weekDays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
-  const [activeMonth, setActiveMonth] = useState(0); // 0, 1, or 2
-
   const activeDate = months[activeMonth];
   const yearNum = activeDate.getFullYear();
   const monthNum = activeDate.getMonth();
@@ -51,15 +75,13 @@ export default function Calendar() {
     <div key={`blank-${i}`} className="p-2" />
   ));
 
-  const today = getTodayIST();
-
   const days = Array.from({ length: daysInMonth }).map((_, i) => {
     const date = i + 1;
     const dateStr = `${yearNum}-${String(monthNum + 1).padStart(2, "0")}-${String(date).padStart(2, "0")}`;
     const isBooked = BOOKED_DATES.includes(dateStr);
-    // Compare against IST midnight — a date is past if it is strictly before today
+    // Compare against IST midnight — a date is past if it is strictly before or equal to today
     const thisDate = new Date(yearNum, monthNum, date);
-    const isPast = thisDate < today;
+    const isPast = thisDate <= today;
 
     let bgClass = "";
     if (isPast) {
