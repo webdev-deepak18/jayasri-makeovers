@@ -79,7 +79,7 @@ export default function About() {
 
           <div className="flex flex-col gap-3 w-full max-w-xs mx-auto">
             <a
-              href="phonepe://pay?pa=8867052945%40ybl&pn=Jayashree%20C&cu=INR"
+              href="phonepe://"
               className="w-full flex items-center justify-center gap-2 bg-[#5f259f] hover:bg-[#4a1a80] active:scale-95 text-white font-poppins font-semibold px-4 py-3.5 rounded-xl shadow-md transition-all text-base"
             >
               <span className="text-xl">⚡</span>
