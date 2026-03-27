@@ -2,19 +2,39 @@
 
 import { useLanguage } from "@/context/LanguageContext";
 import Image from "next/image";
+import { useState, useEffect } from "react";
+
+const HERO_IMAGES = [
+  "/images/portfolio/bridal-01.webp",
+  "/images/portfolio/hd-01.webp",
+  "/images/portfolio/bridal-02.webp",
+  "/images/portfolio/engagement-01.webp",
+  "/images/portfolio/simple-01.webp",
+  "/images/portfolio/reception-01.webp",
+  "/images/portfolio/simple-02.webp",
+  "/images/portfolio/simple-03.webp",
+  "/images/portfolio/babyshower-01.webp",
+  "/images/portfolio/babyshower-02.webp",
+];
 
 export default function Hero() {
   const { t } = useLanguage();
+  const [heroImage, setHeroImage] = useState(HERO_IMAGES[0]);
+
+  useEffect(() => {
+    const randomImage = HERO_IMAGES[Math.floor(Math.random() * HERO_IMAGES.length)];
+    setHeroImage(randomImage);
+  }, []);
 
   return (
     <section className="relative w-full h-[65vh] min-h-[500px] flex items-end justify-center pb-12">
       <div className="absolute inset-0 z-0">
         <Image 
-          src="/images/portfolio/bridal-01.webp" 
-          alt="Jayasri Makeovers Bridal Work"
+          src={heroImage} 
+          alt="Jayasri Makeovers Professional Work"
           fill
           priority
-          className="object-cover object-[center_35%] protect-image"
+          className="object-cover object-[center_35%] protect-image transition-opacity duration-1000"
           draggable={false}
         />
         {/* Watermark Overlay */}
