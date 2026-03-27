@@ -2,29 +2,10 @@
 
 import { useLanguage } from "@/context/LanguageContext";
 import Image from "next/image";
-import { useState, useEffect } from "react";
-
-const HERO_IMAGES = [
-  "/images/portfolio/bridal-01.webp",
-  "/images/portfolio/hd-01.webp",
-  "/images/portfolio/bridal-02.webp",
-  "/images/portfolio/engagement-01.webp",
-  "/images/portfolio/simple-01.webp",
-  "/images/portfolio/reception-01.webp",
-  "/images/portfolio/simple-02.webp",
-  "/images/portfolio/simple-03.webp",
-  "/images/portfolio/babyshower-01.webp",
-  "/images/portfolio/babyshower-02.webp",
-];
 
 export default function Hero() {
   const { t } = useLanguage();
-  const [heroImage, setHeroImage] = useState(HERO_IMAGES[0]);
-
-  useEffect(() => {
-    const randomImage = HERO_IMAGES[Math.floor(Math.random() * HERO_IMAGES.length)];
-    setHeroImage(randomImage);
-  }, []);
+  const heroImage = "/images/portfolio/hd-01.webp";
 
   return (
     <section className="relative w-full h-[65vh] min-h-[500px] flex items-end justify-center pb-12">
@@ -37,12 +18,6 @@ export default function Hero() {
           className="object-cover object-[center_35%] protect-image transition-opacity duration-1000"
           draggable={false}
         />
-        {/* Watermark Overlay */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-30 select-none pointer-events-none">
-          <p className="text-white text-2xl font-bold -rotate-12 tracking-widest uppercase drop-shadow-xl whitespace-nowrap">
-            Jayasri Makeovers <br/> 88670 52945
-          </p>
-        </div>
         {/* Gradient for text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
       </div>
