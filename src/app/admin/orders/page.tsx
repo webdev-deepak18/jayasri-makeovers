@@ -44,17 +44,22 @@ export default async function OrdersPage({
       {/* Orders List */}
       <div className="space-y-3">
         {orders.map((order) => {
-          const date = new Date(order.date);
+          const allDates = order.date ? order.date.split(',').map((d: string) => d.trim()).sort() : [];
+          const firstDate = allDates[0] ? new Date(allDates[0]) : new Date();
+          const extraDates = allDates.length - 1;
           const pendingAmount = Number(order.total_price) - Number(order.advance_amount);
           const isPending = pendingAmount > 0;
 
           return (
             <Link href={`/admin/orders/${order.id}/edit`} key={order.id} className="block">
               <div className="bg-white p-4 rounded-xl shadow-sm border border-neutral-100 flex gap-4">
-                <div className="w-16 h-16 flex-shrink-0 bg-brand-light rounded-lg border border-brand-secondary/20 flex flex-col items-center justify-center">
-                  <span className="text-[10px] font-bold uppercase text-brand-primary tracking-widest">{format(date, 'MMM')}</span>
-                  <span className="text-xl font-poppins font-bold text-brand-primary leading-none">{format(date, 'dd')}</span>
-                  <span className="text-[10px] text-neutral-500 mt-1">{format(date, 'yyyy')}</span>
+                <div className="w-16 h-16 flex-shrink-0 bg-brand-light rounded-lg border border-brand-secondary/20 flex flex-col items-center justify-center relative">
+                  <span className="text-[10px] font-bold uppercase text-brand-primary tracking-widest">{format(firstDate, 'MMM')}</span>
+                  <span className="text-xl font-poppins font-bold text-brand-primary leading-none">{format(firstDate, 'dd')}</span>
+                  <span className="text-[10px] text-neutral-500 mt-1">{format(firstDate, 'yyyy')}</span>
+                  {extraDates > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 bg-brand-secondary text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">+{extraDates}</span>
+                  )}
                 </div>
 
                 <div className="flex-grow min-w-0 flex flex-col justify-center">

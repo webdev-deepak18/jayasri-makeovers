@@ -16,7 +16,46 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
 
   const pendingAmount = Math.max(0, totalPrice - advanceAmount);
 
+  // Makeup type state
+  const predefinedTypes = ["Bridal", "Pre-Wedding", "Engagement", "Party", "Saree Draping"];
+  const initialIsOther = initialData?.makeup_type ? !predefinedTypes.includes(initialData.makeup_type) : false;
+  
+  const [makeupType, setMakeupType] = useState<string>(initialIsOther ? "Other" : (initialData?.makeup_type || "Bridal"));
+  const [customMakeup, setCustomMakeup] = useState<string>(initialIsOther ? initialData.makeup_type : "");
+  
+  const finalMakeupType = makeupType === "Other" ? customMakeup : makeupType;
+
+  // Dates state
+  const [dates, setDates] = useState<string[]>(
+    initialData?.date ? initialData.date.split(',').map((d: string) => d.trim()) : [""]
+  );
+
+  const handleDateChange = (index: number, value: string) => {
+    const newDates = [...dates];
+    newDates[index] = value;
+    setDates(newDates);
+  };
+
+  const addDate = () => setDates([...dates, ""]);
+  
+  const removeDate = (index: number) => {
+    if (dates.length > 1) {
+      setDates(dates.filter((_, i) => i !== index));
+    }
+  };
+
+  const finalDatesString = dates.filter(d => Boolean(d)).sort().join(', ');
+
   async function handleSubmit(formData: FormData) {
+    if (makeupType === "Other" && !customMakeup.trim()) {
+      setError("Please specify the custom makeup type.");
+      return;
+    }
+    if (!finalDatesString) {
+      setError("Please select at least one date.");
+      return;
+    }
+
     setError("");
     startTransition(async () => {
       let result;
@@ -49,6 +88,10 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
 
   return (
     <form action={handleSubmit} className="space-y-5 bg-white p-5 rounded-2xl shadow-sm border border-neutral-100 flex flex-col">
+      {/* Hidden inputs to capture computed values */}
+      <input type="hidden" name="makeup_type" value={finalMakeupType} />
+      <input type="hidden" name="date" value={finalDatesString} />
+
       {error && (
         <div className="p-3 bg-red-50 text-red-600 border border-red-100 rounded-lg text-sm text-center">
           {error}
@@ -75,19 +118,57 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs font-semibold text-neutral-500 mb-1 uppercase tracking-wide">Makeup Type</label>
-          <select name="makeup_type" required defaultValue={initialData?.makeup_type || "Bridal"} className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:ring-1 focus:ring-brand-secondary outline-none font-poppins bg-white">
-            <option>Bridal</option>
-            <option>Pre-Wedding</option>
-            <option>Engagement</option>
-            <option>Party</option>
-            <option>Saree Draping</option>
-            <option>Other</option>
+          <select 
+            value={makeupType}
+            onChange={(e) => setMakeupType(e.target.value)}
+            className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:ring-1 focus:ring-brand-secondary outline-none font-poppins bg-white"
+          >
+            {predefinedTypes.map(pt => <option key={pt} value={pt}>{pt}</option>)}
+            <option value="Other">Other (Specify)</option>
           </select>
+
+          {makeupType === "Other" && (
+            <div className="mt-2 animate-in fade-in zoom-in-95 duration-200">
+              <input 
+                type="text" 
+                placeholder="e.g. Baby Shower, Haldi"
+                value={customMakeup}
+                onChange={(e) => setCustomMakeup(e.target.value)}
+                className="w-full px-3 py-2 border border-brand-secondary text-brand-primary rounded-lg focus:ring-1 focus:ring-brand-primary outline-none font-poppins" 
+              />
+            </div>
+          )}
         </div>
+        
         <div>
-          <label className="block text-xs font-semibold text-neutral-500 mb-1 uppercase tracking-wide">Date</label>
-          <input type="date" name="date" required defaultValue={initialData?.date} className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:ring-1 focus:ring-brand-secondary outline-none font-poppins" />
+          <label className="block text-xs font-semibold text-neutral-500 mb-1 uppercase tracking-wide">Date(s)</label>
+          <div className="space-y-2">
+            {dates.map((d, i) => (
+              <div key={i} className="flex gap-2 items-center">
+                <input 
+                  type="date" 
+                  value={d}
+                  onChange={(e) => handleDateChange(i, e.target.value)}
+                  className="flex-1 px-3 py-2 border border-neutral-200 rounded-lg focus:ring-1 focus:ring-brand-secondary outline-none font-poppins" 
+                />
+                {dates.length > 1 && (
+                  <button type="button" onClick={() => removeDate(i)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                  </button>
+                )}
+              </div>
+            ))}
+            <button 
+              type="button" 
+              onClick={addDate}
+              className="text-xs font-bold text-brand-secondary hover:text-brand-primary flex items-center gap-1 transition-colors uppercase tracking-wide"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+              Add Date
+            </button>
+          </div>
         </div>
+
         <div className="md:col-span-2">
           <label className="block text-xs font-semibold text-neutral-500 mb-1 uppercase tracking-wide">Location / Venue</label>
           <input type="text" name="location" required defaultValue={initialData?.location} className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:ring-1 focus:ring-brand-secondary outline-none font-poppins" />

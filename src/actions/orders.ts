@@ -17,51 +17,56 @@ export interface DashboardStats {
 export async function getDashboardStats(): Promise<DashboardStats> {
   const today = new Date();
   const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1).toISOString();
+  const todayStr = today.toISOString().split('T')[0];
   
-  // 1. Total Earnings (all completed or upcoming advance)
-  // Actually, let's just sum `advance_amount` for all time as cash-in-hand
-  const { data: allOrders } = await supabase.from("orders").select("advance_amount, total_price, status, date");
+  // Fetch all orders for JS filtering (dashboard needs it for stats and recent upcoming)
+  const { data: allOrders } = await supabase.from("orders").select("*");
   
   let totalEarnings = 0;
   let earningsThisMonth = 0;
   let activeOrdersCount = 0;
+  let upcomingList: any[] = [];
 
   if (allOrders) {
     allOrders.forEach(o => {
-      // Sum advance amounts (money received)
-      totalEarnings += Number(o.advance_amount || 0);
+      const advanceAmount = Number(o.advance_amount || 0);
+      totalEarnings += advanceAmount;
       
-      // Calculate this month
-      if (new Date(o.date) >= new Date(firstDayOfMonth)) {
-        earningsThisMonth += Number(o.advance_amount || 0);
+      if (!o.date) return;
+      const dates = o.date.split(',').map((d: string) => d.trim()).sort();
+      const firstDate = dates[0];
+      const lastDate = dates[dates.length - 1];
+      
+      // Calculate this month based on the first event date
+      if (new Date(firstDate) >= new Date(firstDayOfMonth) && new Date(firstDate) < new Date(today.getFullYear(), today.getMonth() + 1, 1)) {
+        earningsThisMonth += advanceAmount;
       }
 
       // Count active (upcoming)
-      if (o.status === 'upcoming') {
+      if (o.status === 'upcoming' && lastDate >= todayStr) {
         activeOrdersCount++;
+        upcomingList.push(o);
       }
     });
+    
+    // Sort upcoming by first date
+    upcomingList.sort((a, b) => {
+      const aFirst = a.date.split(',')[0].trim();
+      const bFirst = b.date.split(',')[0].trim();
+      return aFirst.localeCompare(bFirst);
+    });
   }
-
-  // 2. Next 5 upcoming orders
-  const { data: upcomingOrders } = await supabase
-    .from("orders")
-    .select("*")
-    .eq("status", "upcoming")
-    .gte("date", today.toISOString().split('T')[0])
-    .order("date", { ascending: true })
-    .limit(5);
 
   return {
     totalEarnings,
     earningsThisMonth,
     activeOrdersCount,
-    upcomingOrders: upcomingOrders || [],
+    upcomingOrders: upcomingList.slice(0, 5),
   };
 }
 
 export async function getOrders(statusFilter?: string) {
-  let query = supabase.from("orders").select("*").order("date", { ascending: false });
+  let query = supabase.from("orders").select("*");
   
   if (statusFilter && statusFilter !== "all") {
     query = query.eq("status", statusFilter);
@@ -69,14 +74,22 @@ export async function getOrders(statusFilter?: string) {
 
   const { data, error } = await query;
   if (error) throw new Error(error.message);
-  return data || [];
+  
+  // Sort in JS because of comma separated string format
+  const sorted = (data || []).sort((a, b) => {
+    const aFirst = a.date?.split(',')[0].trim() || "0000";
+    const bFirst = b.date?.split(',')[0].trim() || "0000";
+    return bFirst.localeCompare(aFirst); // descending
+  });
+  
+  return sorted;
 }
 
 export async function getClients() {
   // Get unique clients by name + phone
   const { data, error } = await supabase
     .from("orders")
-    .select("client_name, phone_number, location")
+    .select("client_name, phone_number, location, created_at")
     .order("created_at", { ascending: false });
 
   if (error) throw new Error(error.message);
@@ -150,5 +163,13 @@ export async function getPublicBookedDates() {
     .from("orders")
     .select("date")
     .neq("status", "cancelled");
-  return data?.map(o => o.date) || [];
+    
+  if (!data) return [];
+  
+  const allDates = data.flatMap(o => {
+    if (!o.date) return [];
+    return o.date.split(',').map((d: string) => d.trim());
+  });
+  
+  return Array.from(new Set(allDates));
 }

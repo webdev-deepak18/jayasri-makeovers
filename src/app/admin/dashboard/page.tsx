@@ -52,15 +52,20 @@ export default async function DashboardPage() {
           ) : (
             <div className="divide-y divide-neutral-100">
               {stats.upcomingOrders.map((order) => {
-                const orderDate = new Date(order.date);
+                const allDates = order.date ? order.date.split(',').map((d: string) => d.trim()).sort() : [];
+                const firstDate = allDates[0] ? new Date(allDates[0]) : new Date();
+                const extraDates = allDates.length - 1;
                 const pendingAmount = Number(order.total_price) - Number(order.advance_amount);
                 const hasPending = pendingAmount > 0;
                 
                 return (
                   <Link href={`/admin/orders/${order.id}/edit`} key={order.id} className="flex p-4 hover:bg-neutral-50 transition-colors">
-                    <div className="flex-shrink-0 w-14 flex flex-col items-center justify-center bg-brand-light rounded-lg text-brand-primary border border-brand-secondary/20 mr-4">
-                      <span className="text-xs font-bold uppercase">{format(orderDate, 'MMM')}</span>
-                      <span className="text-lg font-bold font-poppins">{format(orderDate, 'dd')}</span>
+                    <div className="flex-shrink-0 w-14 flex flex-col items-center justify-center bg-brand-light rounded-lg text-brand-primary border border-brand-secondary/20 mr-4 relative">
+                      <span className="text-xs font-bold uppercase">{format(firstDate, 'MMM')}</span>
+                      <span className="text-lg font-bold font-poppins">{format(firstDate, 'dd')}</span>
+                      {extraDates > 0 && (
+                        <span className="absolute -top-1.5 -right-1.5 bg-brand-secondary text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">+{extraDates}</span>
+                      )}
                     </div>
                     <div className="flex-grow min-w-0">
                       <h4 className="font-semibold text-neutral-900 truncate">{order.client_name}</h4>
