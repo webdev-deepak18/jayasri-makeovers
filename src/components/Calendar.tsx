@@ -3,9 +3,6 @@
 import { useLanguage } from "@/context/LanguageContext";
 import { useState, useEffect } from "react";
 
-// Simple JS Config for booked dates
-const BOOKED_DATES = ["2026-04-11", "2026-04-12"];
-
 /** Returns today's date as YYYY-MM-DD string in IST, regardless of visitor's device locale */
 function getTodayIST(): Date {
   // toLocaleDateString with timeZone gives us the IST date string, which we parse back into a midnight Date
@@ -16,7 +13,8 @@ function getTodayIST(): Date {
   return d;
 }
 
-export default function Calendar() {
+// Dynamic booked dates passed from Next.js server component
+export default function Calendar({ bookedDates = [] }: { bookedDates?: string[] }) {
   const { t } = useLanguage();
 
   const [today, setToday] = useState<Date | null>(null);
@@ -78,7 +76,7 @@ export default function Calendar() {
   const days = Array.from({ length: daysInMonth }).map((_, i) => {
     const date = i + 1;
     const dateStr = `${yearNum}-${String(monthNum + 1).padStart(2, "0")}-${String(date).padStart(2, "0")}`;
-    const isBooked = BOOKED_DATES.includes(dateStr);
+    const isBooked = bookedDates.includes(dateStr);
     // Compare against IST midnight — a date is past if it is strictly before or equal to today
     const thisDate = new Date(yearNum, monthNum, date);
     const isPast = thisDate <= today;

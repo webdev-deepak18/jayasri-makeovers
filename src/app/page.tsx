@@ -6,15 +6,18 @@ import Calendar from "@/components/Calendar";
 import Testimonial from "@/components/Testimonial";
 import About from "@/components/About";
 import Footer from "@/components/Footer";
+import { getPublicBookedDates } from "@/actions/orders";
 
-export default function Home() {
+export default async function Home() {
+  const bookedDates = await getPublicBookedDates();
+
   return (
     <main className="flex min-h-screen flex-col w-full bg-white">
       <Navbar />
       <Hero />
       <Pricing />
       <Portfolio />
-      <Calendar />
+      <Calendar bookedDates={bookedDates} />
       <Testimonial />
       <About />
       <div className="h-10 bg-brand-light w-full"></div> {/* Spacer for fixed whatsapp button if added later */}
