@@ -29,11 +29,11 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
   const minDate = tomorrow.toISOString().split("T")[0];
 
   // Makeup type state
-  const predefinedTypes = ["Bridal", "Pre-Wedding", "Engagement", "Party", "Saree Draping"];
+  const predefinedTypes = ["Simple Makeover", "Bridal Makeover", "Saree + Hair Draping"];
   const initialIsOther = initialData?.makeup_type ? !predefinedTypes.includes(initialData.makeup_type) : false;
 
   const [makeupType, setMakeupType] = useState<string>(
-    initialIsOther ? "Other" : initialData?.makeup_type || "Bridal"
+    initialIsOther ? "Other" : initialData?.makeup_type || "Simple Makeover"
   );
   const [customMakeup, setCustomMakeup] = useState<string>(
     initialIsOther ? initialData.makeup_type : ""
@@ -253,10 +253,10 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
               onChange={(e) => setMakeupType(e.target.value)}
               className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:ring-1 focus:ring-brand-secondary outline-none font-poppins bg-white"
             >
-              {predefinedTypes.map((pt) => (
-                <option key={pt} value={pt}>{MAKEUP_ICONS[pt]} {pt}</option>
-              ))}
-              <option value="Other">💄 Other (Specify)</option>
+              <option value="Simple Makeover">Simple Makeover — makeup + hair + saree draping</option>
+              <option value="Bridal Makeover">Bridal Makeover — HD makeup + hair + saree draping</option>
+              <option value="Saree + Hair Draping">Saree + Hair Draping only</option>
+              <option value="Other">Other (specify)</option>
             </select>
 
             {makeupType === "Other" && (

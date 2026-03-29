@@ -54,20 +54,22 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       const lastDate = dates[dates.length - 1] || '';
 
       if (o.status === 'completed') {
-        // Completed: full price is earned
-        totalEarned += total;
+        // Completed: service price minus travel (travel is pass-through, not Jayasri's income)
+        const serviceEarned = total - travel;
+        totalEarned += serviceEarned;
         completedOrdersCount++;
         completedList.push(o);
 
         // This month (completed events this month)
         if (firstDate >= firstDayOfMonth.toISOString().split('T')[0] &&
             firstDate < firstDayOfNextMonth.toISOString().split('T')[0]) {
-          earningsThisMonth += total;
+          earningsThisMonth += serviceEarned;
         }
       } else if (o.status === 'upcoming') {
         // Upcoming: only the advance is earned so far
+        // Pending = service price (excluding travel) minus advance already paid
         totalEarned += advance;
-        pendingToCollect += Math.max(0, total - advance);
+        pendingToCollect += Math.max(0, (total - travel) - advance);
 
         if (lastDate >= todayStr) {
           openOrdersCount++;
