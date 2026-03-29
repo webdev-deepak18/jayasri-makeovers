@@ -130,26 +130,11 @@ export default function Calendar({ bookedDates = [] }: { bookedDates?: string[] 
         })}
       </div>
 
-      {/* Legend */}
-      <div className="flex justify-center gap-6 mb-6 text-sm font-semibold">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-green-500 shadow-sm border border-white" />
-          <span className="text-neutral-600">{t("calendar.available")}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-red-400 shadow-sm border border-white" />
-          <span className="text-neutral-600">{t("calendar.booked")}</span>
-        </div>
-      </div>
-
       {/* Single Calendar */}
-      <div className="bg-white rounded-2xl p-5 shadow-sm border border-neutral-100">
-        <h4 className="font-playfair text-xl font-bold text-center mb-4 text-brand-primary">
-          {activeDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
-        </h4>
+      <div className="bg-white rounded-3xl p-5 shadow-sm border border-neutral-100 max-w-sm mx-auto">
         <div className="grid grid-cols-7 gap-2 mb-2">
           {weekDays.map((day) => (
-            <div key={day} className="text-center text-xs font-bold text-neutral-400">
+            <div key={day} className="text-center text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
               {day}
             </div>
           ))}
@@ -157,6 +142,18 @@ export default function Calendar({ bookedDates = [] }: { bookedDates?: string[] 
         <div className="grid grid-cols-7 gap-2">
           {blanks}
           {days}
+        </div>
+
+        {/* Integrated Legend at Bottom */}
+        <div className="mt-6 pt-4 border-t border-dashed border-neutral-100 flex justify-center gap-6">
+          <div className="flex items-center gap-2">
+            <div className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-sm border border-white" />
+            <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider">{t("calendar.available")}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-2.5 h-2.5 rounded-full bg-red-400 shadow-sm border border-white" />
+            <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider">{t("calendar.booked")}</span>
+          </div>
         </div>
       </div>
     </section>
