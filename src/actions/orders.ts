@@ -8,60 +8,98 @@ export type OrderStatus = "upcoming" | "completed" | "cancelled";
 export type MakeupType = "Bridal" | "Pre-Wedding" | "Engagement" | "Party" | "Saree Draping" | "Other";
 
 export interface DashboardStats {
-  totalEarnings: number;
+  /** Completed orders: full total_price. Upcoming orders: advance only. Real money = yours. */
+  totalEarned: number;
+  /** Balance still to collect across all upcoming orders */
+  pendingToCollect: number;
+  /** All advance amounts received so far (cash in hand) */
+  cashCollected: number;
+  totalTravelExpense: number;
+  /** totalEarned logic applied to this month's events only */
   earningsThisMonth: number;
-  activeOrdersCount: number;
-  upcomingOrders: any[];
+  openOrdersCount: number;
+  completedOrdersCount: number;
+  upcomingOrders: any[];   // open, sorted by date asc
+  completedOrders: any[];  // closed, sorted by date desc
 }
 
 export async function getDashboardStats(): Promise<DashboardStats> {
   const today = new Date();
-  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1).toISOString();
+  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  const firstDayOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
   const todayStr = today.toISOString().split('T')[0];
-  
-  // Fetch all orders for JS filtering (dashboard needs it for stats and recent upcoming)
+
   const { data: allOrders } = await supabase.from("orders").select("*");
-  
-  let totalEarnings = 0;
+
+  let totalEarned = 0;
+  let pendingToCollect = 0;
+  let cashCollected = 0;
+  let totalTravelExpense = 0;
   let earningsThisMonth = 0;
-  let activeOrdersCount = 0;
+  let openOrdersCount = 0;
+  let completedOrdersCount = 0;
   let upcomingList: any[] = [];
+  let completedList: any[] = [];
 
   if (allOrders) {
     allOrders.forEach(o => {
-      const advanceAmount = Number(o.advance_amount || 0);
-      totalEarnings += advanceAmount;
-      
-      if (!o.date) return;
-      const dates = o.date.split(',').map((d: string) => d.trim()).sort();
-      const firstDate = dates[0];
-      const lastDate = dates[dates.length - 1];
-      
-      // Calculate this month based on the first event date
-      if (new Date(firstDate) >= new Date(firstDayOfMonth) && new Date(firstDate) < new Date(today.getFullYear(), today.getMonth() + 1, 1)) {
-        earningsThisMonth += advanceAmount;
-      }
+      const advance = Number(o.advance_amount || 0);
+      const total = Number(o.total_price || 0);
+      const travel = Number(o.travel_expense || 0);
+      cashCollected += advance;
+      totalTravelExpense += travel;
 
-      // Count active (upcoming)
-      if (o.status === 'upcoming' && lastDate >= todayStr) {
-        activeOrdersCount++;
-        upcomingList.push(o);
+      const dates = o.date ? o.date.split(',').map((d: string) => d.trim()).sort() : [];
+      const firstDate = dates[0] || '';
+      const lastDate = dates[dates.length - 1] || '';
+
+      if (o.status === 'completed') {
+        // Completed: full price is earned
+        totalEarned += total;
+        completedOrdersCount++;
+        completedList.push(o);
+
+        // This month (completed events this month)
+        if (firstDate >= firstDayOfMonth.toISOString().split('T')[0] &&
+            firstDate < firstDayOfNextMonth.toISOString().split('T')[0]) {
+          earningsThisMonth += total;
+        }
+      } else if (o.status === 'upcoming') {
+        // Upcoming: only the advance is earned so far
+        totalEarned += advance;
+        pendingToCollect += Math.max(0, total - advance);
+
+        if (lastDate >= todayStr) {
+          openOrdersCount++;
+          upcomingList.push(o);
+        }
+
+        // This month (upcoming events this month — count advance)
+        if (firstDate >= firstDayOfMonth.toISOString().split('T')[0] &&
+            firstDate < firstDayOfNextMonth.toISOString().split('T')[0]) {
+          earningsThisMonth += advance;
+        }
       }
     });
-    
-    // Sort upcoming by first date
-    upcomingList.sort((a, b) => {
-      const aFirst = a.date.split(',')[0].trim();
-      const bFirst = b.date.split(',')[0].trim();
-      return aFirst.localeCompare(bFirst);
-    });
+
+    upcomingList.sort((a, b) =>
+      (a.date.split(',')[0].trim()).localeCompare(b.date.split(',')[0].trim())
+    );
+    completedList.sort((a, b) =>
+      (b.date.split(',')[0].trim()).localeCompare(a.date.split(',')[0].trim())
+    );
   }
 
   return {
-    totalEarnings,
+    totalEarned,
+    pendingToCollect,
+    cashCollected,
+    totalTravelExpense,
     earningsThisMonth,
-    activeOrdersCount,
-    upcomingOrders: upcomingList.slice(0, 5),
+    openOrdersCount,
+    completedOrdersCount,
+    upcomingOrders: upcomingList,
+    completedOrders: completedList.slice(0, 10),
   };
 }
 
@@ -119,6 +157,7 @@ export async function createOrder(formData: FormData) {
     location: formData.get("location") as string,
     total_price: parseFloat(formData.get("total_price") as string) || 0,
     advance_amount: parseFloat(formData.get("advance_amount") as string) || 0,
+    travel_expense: parseFloat(formData.get("travel_expense") as string) || 0,
     custom_message: formData.get("custom_message") as string,
     status: (formData.get("status") as string) || "upcoming",
   };
@@ -139,6 +178,7 @@ export async function updateOrder(id: string, formData: FormData) {
     location: formData.get("location") as string,
     total_price: parseFloat(formData.get("total_price") as string) || 0,
     advance_amount: parseFloat(formData.get("advance_amount") as string) || 0,
+    travel_expense: parseFloat(formData.get("travel_expense") as string) || 0,
     custom_message: formData.get("custom_message") as string,
     status: (formData.get("status") as string) || "upcoming",
   };
@@ -157,6 +197,31 @@ export async function deleteOrder(id: string) {
   revalidatePath("/", "layout");
   return { success: true };
 }
+
+/** Mark an order complete + optionally add balance received on event day */
+export async function quickCompleteOrder(id: string, balanceReceived: number) {
+  // Fetch current advance to add the balance on top
+  const { data: order, error: fetchErr } = await supabase
+    .from("orders")
+    .select("advance_amount, total_price")
+    .eq("id", id)
+    .single();
+
+  if (fetchErr || !order) return { success: false, error: "Order not found" };
+
+  const newAdvance = Number(order.advance_amount) + balanceReceived;
+
+  const { error } = await supabase
+    .from("orders")
+    .update({ advance_amount: newAdvance, status: "completed" })
+    .eq("id", id);
+
+  if (error) return { success: false, error: error.message };
+
+  revalidatePath("/", "layout");
+  return { success: true };
+}
+
 
 export async function getPublicBookedDates() {
   const { data } = await supabase

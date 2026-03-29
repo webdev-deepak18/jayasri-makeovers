@@ -1,6 +1,7 @@
 import { getOrders } from "@/actions/orders";
 import Link from "next/link";
 import { format } from "date-fns";
+import { getMakeupIcon } from "@/lib/makeup-utils";
 import { FunnelIcon, ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
 
 export const revalidate = 0; // force dynamic rendering
@@ -65,7 +66,7 @@ export default async function OrdersPage({
                 <div className="flex-grow min-w-0 flex flex-col justify-center">
                   <h3 className="font-playfair font-bold text-lg text-neutral-900 truncate leading-tight mb-1">{order.client_name}</h3>
                   <div className="flex items-center gap-2 text-xs text-neutral-500 mb-2">
-                    <span className="bg-neutral-100 px-2 py-0.5 rounded-md">{order.makeup_type}</span>
+                    <span className="bg-neutral-100 px-2 py-0.5 rounded-md">{getMakeupIcon(order.makeup_type)} {order.makeup_type}</span>
                     <span className="truncate">{order.location}</span>
                   </div>
 
