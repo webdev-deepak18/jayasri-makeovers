@@ -246,27 +246,59 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Makeup type */}
-          <div>
-            <label className="block text-xs font-semibold text-neutral-500 mb-1 uppercase tracking-wide">Makeup Type</label>
-            <select
-              value={makeupType}
-              onChange={(e) => setMakeupType(e.target.value)}
-              className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:ring-1 focus:ring-brand-secondary outline-none font-poppins bg-white"
-            >
-              <option value="Simple Makeover">Simple Makeover — makeup + hair + saree draping</option>
-              <option value="Bridal Makeover">Bridal Makeover — HD makeup + hair + saree draping</option>
-              <option value="Saree + Hair Draping">Saree + Hair Draping only</option>
-              <option value="Other">Other (specify)</option>
-            </select>
+          <div className="md:col-span-2">
+            <label className="block text-xs font-semibold text-neutral-500 mb-2 uppercase tracking-wide">Select Service</label>
+            <div className="grid grid-cols-1 gap-2.5">
+              {[
+                { id: "Simple Makeover", desc: "Makeup + Hair + Saree Draping" },
+                { id: "Bridal Makeover", desc: "HD Makeup + Hair + Saree Draping" },
+                { id: "Saree + Hair Draping", desc: "Saree + Hair Draping only" },
+                { id: "Other", desc: "Something else — please specify" }
+              ].map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setMakeupType(opt.id)}
+                  className={`flex items-center gap-3 p-3.5 rounded-xl border-2 transition-all text-left group ${
+                    makeupType === opt.id
+                      ? "border-brand-primary bg-brand-primary/5 ring-1 ring-brand-primary/20"
+                      : "border-neutral-100 bg-neutral-50 hover:border-neutral-200 active:scale-[0.99]"
+                  }`}
+                >
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl transition-colors ${
+                    makeupType === opt.id ? "bg-brand-primary text-white" : "bg-white text-neutral-400 border border-neutral-100"
+                  }`}>
+                    {getMakeupIcon(opt.id)}
+                  </div>
+                  <div className="flex-grow">
+                    <h4 className={`text-sm font-bold transition-colors ${
+                      makeupType === opt.id ? "text-brand-primary" : "text-neutral-700"
+                    }`}>
+                      {opt.id}
+                    </h4>
+                    <p className={`text-[10px] uppercase font-medium tracking-wider transition-colors mt-0.5 ${
+                      makeupType === opt.id ? "text-brand-primary/60" : "text-neutral-400"
+                    }`}>
+                      {opt.desc}
+                    </p>
+                  </div>
+                  {makeupType === opt.id && (
+                    <div className="text-brand-primary">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
 
             {makeupType === "Other" && (
-              <div className="mt-2">
+              <div className="mt-3">
                 <input
                   type="text"
                   placeholder="e.g. Baby Shower, Haldi"
                   value={customMakeup}
                   onChange={(e) => setCustomMakeup(e.target.value)}
-                  className="w-full px-3 py-2 border border-brand-secondary text-brand-primary rounded-lg focus:ring-1 focus:ring-brand-primary outline-none font-poppins"
+                  className="w-full px-4 py-3 border-2 border-brand-secondary text-brand-primary rounded-xl focus:ring-1 focus:ring-brand-primary outline-none font-poppins font-semibold bg-white animate-in slide-in-from-top-2 duration-300"
                 />
               </div>
             )}
