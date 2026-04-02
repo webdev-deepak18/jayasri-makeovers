@@ -74,7 +74,7 @@ export default async function DashboardPage({
         {stats.totalTravelExpense > 0 && (
           <div className="flex items-center justify-between bg-neutral-50 border border-neutral-200 px-4 py-3 rounded-xl">
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">Travel Expenses</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">Expenses (Travel, Etc)</p>
               <p className="text-[10px] text-neutral-400 mt-0.5">Not included in earnings</p>
             </div>
             <p className="text-lg font-poppins font-bold text-neutral-600">₹{stats.totalTravelExpense.toLocaleString()}</p>

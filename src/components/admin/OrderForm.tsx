@@ -29,7 +29,7 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
   const minDate = tomorrow.toISOString().split("T")[0];
 
   // Makeup type state
-  const predefinedTypes = ["Simple Makeover", "Bridal Makeover", "Saree + Hair Draping"];
+  const predefinedTypes = ["Simple Makeover", "Bridal Makeover", "Saree Draping + Hairstyle"];
   const initialIsOther = initialData?.makeup_type ? !predefinedTypes.includes(initialData.makeup_type) : false;
 
   const [makeupType, setMakeupType] = useState<string>(
@@ -252,7 +252,7 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
               {[
                 { id: "Simple Makeover", desc: "Makeup + Hair + Saree Draping" },
                 { id: "Bridal Makeover", desc: "HD Makeup + Hair + Saree Draping" },
-                { id: "Saree + Hair Draping", desc: "Saree + Hair Draping only" },
+                { id: "Saree Draping + Hairstyle", desc: "Saree Draping + Hairstyle only" },
                 { id: "Other", desc: "Something else — please specify" }
               ].map((opt) => (
                 <button
@@ -372,7 +372,7 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
             />
           </div>
           <div className="col-span-2">
-            <label className="block text-xs font-semibold text-neutral-500 mb-1 uppercase tracking-wide">Travel Expense</label>
+            <label className="block text-xs font-semibold text-neutral-500 mb-1 uppercase tracking-wide">Expenses (Travel, Other etc)</label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 font-bold text-sm">₹</span>
               <input
@@ -383,7 +383,7 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
                 className="w-full pl-7 pr-3 py-2 border border-amber-200 rounded-lg focus:ring-1 focus:ring-amber-400 outline-none font-poppins bg-amber-50 text-amber-800 font-bold"
               />
             </div>
-            <p className="text-[10px] text-neutral-400 mt-1">Reimbursed travel cost — not counted in your turnover</p>
+            <p className="text-[10px] text-neutral-400 mt-1">Reimbursed expenses — not counted in your turnover</p>
           </div>
         </div>
 
@@ -399,7 +399,7 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
           </div>
           {travelExpense > 0 && (
             <div className="flex justify-between items-center px-3 py-2 rounded-lg bg-amber-50 border border-amber-100">
-              <span className="text-xs font-semibold text-amber-700 uppercase tracking-widest">Travel Expense</span>
+              <span className="text-xs font-semibold text-amber-700 uppercase tracking-widest">Expenses</span>
               <span className="text-sm font-poppins font-bold text-amber-700">₹{travelExpense} (not in turnover)</span>
             </div>
           )}

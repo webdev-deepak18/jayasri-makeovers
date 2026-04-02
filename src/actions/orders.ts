@@ -67,9 +67,9 @@ export async function getDashboardStats(): Promise<DashboardStats> {
         }
       } else if (o.status === 'upcoming') {
         // Upcoming: only the advance is earned so far
-        // Pending = service price (excluding travel) minus advance already paid
+        // Pending = full amount left to collect from client (including any expenses passed to them)
         totalEarned += advance;
-        pendingToCollect += Math.max(0, (total - travel) - advance);
+        pendingToCollect += Math.max(0, total - advance);
 
         if (lastDate >= todayStr) {
           openOrdersCount++;

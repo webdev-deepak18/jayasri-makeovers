@@ -3,6 +3,7 @@ export const MAKEUP_ICONS: Record<string, string> = {
   "Simple Makeover": "💄",
   "Bridal Makeover": "👰",
   "Saree + Hair Draping": "🥻",
+  "Saree Draping + Hairstyle": "🥻",
 };
 
 export function getMakeupIcon(type: string): string {
