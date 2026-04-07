@@ -15,6 +15,8 @@ const images = [
   { src: "/images/portfolio/reception-01.webp", category: "reception" },
   { src: "/images/portfolio/simple-02.webp", category: "simple" },
   { src: "/images/portfolio/simple-03.webp", category: "simple" },
+  { src: "/images/portfolio/simple-04.webp", category: "simple" },
+  { src: "/images/portfolio/simple-05.webp", category: "simple" },
   { src: "/images/portfolio/babyshower-01.webp", category: "babyShower" },
   { src: "/images/portfolio/hair-01.webp", category: "hair" },
   { src: "/images/portfolio/babyshower-02.webp", category: "babyShower" },
@@ -25,6 +27,7 @@ const images = [
   { src: "/images/portfolio/hair-08.webp", category: "hair" },
   { src: "/images/portfolio/hair-09.webp", category: "hair" },
   { src: "/images/portfolio/hair-10.webp", category: "hair" },
+  { src: "/images/portfolio/hair-11.webp", category: "hair" },
 ];
 
 export default function Portfolio() {
