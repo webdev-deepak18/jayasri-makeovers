@@ -15,8 +15,31 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
   // Real-time calculation state
   const [totalPrice, setTotalPrice] = useState<number>(initialData?.total_price || 0);
   const [advanceAmount, setAdvanceAmount] = useState<number>(initialData?.advance_amount || 0);
-  const [travelExpense, setTravelExpense] = useState<number>(initialData?.travel_expense || 0);
-  const [otherExpenses, setOtherExpenses] = useState<number>(initialData?.other_expenses || 0);
+
+  // Dynamic expense line items
+  // We seed from existing data: travel_expense becomes a line item, then other_expenses with notes
+  const buildInitialExpenses = () => {
+    const items: { amount: number; description: string }[] = [];
+    const travel = Number(initialData?.travel_expense || 0);
+    const other = Number(initialData?.other_expenses || 0);
+    const notes = initialData?.expense_notes || "";
+    if (travel > 0) items.push({ amount: travel, description: "Travel" });
+    if (other > 0) items.push({ amount: other, description: notes || "Other expenses" });
+    return items;
+  };
+  const [expenseItems, setExpenseItems] = useState<{ amount: number; description: string }[]>(buildInitialExpenses);
+  const [showExpenseForm, setShowExpenseForm] = useState(expenseItems.length > 0);
+
+  const totalExpenses = expenseItems.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+  // Travel = first item if description is "Travel", rest = other_expenses
+  const travelExpense = expenseItems.length > 0 && expenseItems[0].description.toLowerCase() === "travel" ? (Number(expenseItems[0].amount) || 0) : 0;
+  const otherExpenses = totalExpenses - travelExpense;
+  const expenseNotes = expenseItems.map(e => `${e.description}: ₹${e.amount}`).join(" | ");
+
+  const addExpenseItem = () => setExpenseItems(prev => [...prev, { amount: 0, description: "" }]);
+  const removeExpenseItem = (i: number) => setExpenseItems(prev => prev.filter((_, idx) => idx !== i));
+  const updateExpenseItem = (i: number, field: "amount" | "description", value: string | number) =>
+    setExpenseItems(prev => prev.map((e, idx) => idx === i ? { ...e, [field]: value } : e));
 
   const pendingAmount = Math.max(0, totalPrice - advanceAmount);
 
@@ -371,31 +394,73 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
               className="w-full px-3 py-2 border border-green-200 rounded-lg focus:ring-1 focus:ring-green-500 outline-none font-poppins bg-green-50 text-green-700 font-bold"
             />
           </div>
+          {/* ── Expenses Section ── */}
           <div className="col-span-2">
-            <label className="block text-xs font-semibold text-neutral-500 mb-1 uppercase tracking-wide">Expenses (Travel, Other etc)</label>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 font-bold text-sm">₹</span>
-                <input
-                  type="number" min="0" name="travel_expense"
-                  value={travelExpense || ""}
-                  onChange={(e) => setTravelExpense(Number(e.target.value))}
-                  placeholder="Travel"
-                  className="w-full pl-7 pr-3 py-2 border border-amber-200 rounded-lg focus:ring-1 focus:ring-amber-400 outline-none font-poppins bg-amber-50 text-amber-800 font-bold text-sm"
-                />
-              </div>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 font-bold text-sm">₹</span>
-                <input
-                  type="number" min="0" name="other_expenses"
-                  value={otherExpenses || ""}
-                  onChange={(e) => setOtherExpenses(Number(e.target.value))}
-                  placeholder="Other (e.g. Accs)"
-                  className="w-full pl-7 pr-3 py-2 border border-amber-200 rounded-lg focus:ring-1 focus:ring-amber-400 outline-none font-poppins bg-amber-50 text-amber-800 font-bold text-sm"
-                />
-              </div>
+            {/* Hidden fields for server action */}
+            <input type="hidden" name="travel_expense" value={travelExpense} />
+            <input type="hidden" name="other_expenses" value={otherExpenses} />
+            <input type="hidden" name="expense_notes" value={expenseNotes} />
+
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-xs font-semibold text-neutral-500 uppercase tracking-wide">Expenses</label>
+              {!showExpenseForm && (
+                <button
+                  type="button"
+                  onClick={() => { setShowExpenseForm(true); if (expenseItems.length === 0) addExpenseItem(); }}
+                  className="text-xs font-bold text-brand-secondary hover:text-brand-primary flex items-center gap-1 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                  Add Expense
+                </button>
+              )}
             </div>
-            <p className="text-[10px] text-neutral-400 mt-1">Reimbursed expenses — not counted in your turnover</p>
+
+            {showExpenseForm && (
+              <div className="space-y-2">
+                {expenseItems.map((item, i) => (
+                  <div key={i} className="flex gap-2 items-center bg-amber-50 border border-amber-100 rounded-xl px-3 py-2">
+                    <span className="text-amber-700 font-bold text-sm shrink-0">₹</span>
+                    <input
+                      type="number"
+                      min="0"
+                      value={item.amount || ""}
+                      onChange={e => updateExpenseItem(i, "amount", Number(e.target.value))}
+                      placeholder="Amount"
+                      className="w-20 shrink-0 bg-transparent border-b border-amber-300 focus:border-amber-500 outline-none font-poppins font-bold text-amber-800 text-sm py-0.5"
+                    />
+                    <input
+                      type="text"
+                      value={item.description}
+                      onChange={e => updateExpenseItem(i, "description", e.target.value)}
+                      placeholder="Description (e.g. Hair clip)"
+                      className="flex-1 bg-transparent border-b border-amber-200 focus:border-amber-500 outline-none font-poppins text-amber-900 text-sm py-0.5 placeholder:text-amber-400"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeExpenseItem(i)}
+                      className="text-amber-400 hover:text-red-500 shrink-0 transition-colors"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={addExpenseItem}
+                  className="text-xs font-bold text-amber-600 hover:text-amber-800 flex items-center gap-1 transition-colors uppercase tracking-wide"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                  Add Another
+                </button>
+                {totalExpenses > 0 && (
+                  <p className="text-[10px] text-neutral-400">Total expenses: ₹{totalExpenses} (deducted from your net earnings)</p>
+                )}
+              </div>
+            )}
+
+            {!showExpenseForm && totalExpenses === 0 && (
+              <p className="text-[11px] text-neutral-400">No expenses added. Tap above to add items like travel or accessories.</p>
+            )}
           </div>
         </div>
 
@@ -409,10 +474,18 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
               {pendingAmount > 0 ? `₹${pendingAmount}` : "Paid in Full"}
             </span>
           </div>
-          {(travelExpense > 0 || otherExpenses > 0) && (
-            <div className="flex justify-between items-center px-3 py-2 rounded-lg bg-amber-50 border border-amber-100">
-              <span className="text-xs font-semibold text-amber-700 uppercase tracking-widest">Expenses</span>
-              <span className="text-sm font-poppins font-bold text-amber-700">₹{(travelExpense + otherExpenses)} (not in turnover)</span>
+          {totalExpenses > 0 && (
+            <div className="space-y-1">
+              <div className="flex justify-between items-center px-3 py-2 rounded-lg bg-amber-50 border border-amber-100">
+                <span className="text-xs font-semibold text-amber-700 uppercase tracking-widest">Total Expenses</span>
+                <span className="text-sm font-poppins font-bold text-amber-700">₹{totalExpenses} (not in earnings)</span>
+              </div>
+              {expenseItems.filter(e => e.description).map((e, i) => (
+                <div key={i} className="flex justify-between items-center px-3 py-1 text-[11px] text-amber-600">
+                  <span>• {e.description}</span>
+                  <span className="font-semibold">₹{e.amount}</span>
+                </div>
+              ))}
             </div>
           )}
         </div>

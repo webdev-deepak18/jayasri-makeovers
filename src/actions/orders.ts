@@ -167,6 +167,7 @@ export async function createOrder(formData: FormData) {
     advance_amount: parseFloat(formData.get("advance_amount") as string) || 0,
     travel_expense: parseFloat(formData.get("travel_expense") as string) || 0,
     other_expenses: parseFloat(formData.get("other_expenses") as string) || 0,
+    expense_notes: (formData.get("expense_notes") as string) || "",
     custom_message: formData.get("custom_message") as string,
     status: (formData.get("status") as string) || "upcoming",
   };
@@ -189,6 +190,7 @@ export async function updateOrder(id: string, formData: FormData) {
     advance_amount: parseFloat(formData.get("advance_amount") as string) || 0,
     travel_expense: parseFloat(formData.get("travel_expense") as string) || 0,
     other_expenses: parseFloat(formData.get("other_expenses") as string) || 0,
+    expense_notes: (formData.get("expense_notes") as string) || "",
     custom_message: formData.get("custom_message") as string,
     status: (formData.get("status") as string) || "upcoming",
   };
