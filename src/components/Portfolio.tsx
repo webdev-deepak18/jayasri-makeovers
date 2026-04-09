@@ -1,7 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/context/LanguageContext";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 
 type Category = "all" | "bridal" | "hair" | "hd" | "engagement" | "simple" | "babyShower" | "reception";
@@ -32,9 +32,15 @@ const images = [
 
 export default function Portfolio() {
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState<Category>("all");
+  const [activeTab, setActiveTab] = useState<Category>("bridal");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const [visibleCount, setVisibleCount] = useState<number>(6);
+  const [visibleCount, setVisibleCount] = useState<number>(8);
+  const [shuffledImages, setShuffledImages] = useState(images);
+
+  // Shuffle images on initial render to prevent hydration mismatch while achieving randomness
+  useEffect(() => {
+    setShuffledImages([...images].sort(() => Math.random() - 0.5));
+  }, []);
 
   // Touch swipe tracking
   const touchStartX = useRef<number>(0);
@@ -51,7 +57,7 @@ export default function Portfolio() {
     { id: "reception", labelKey: "portfolio.reception" },
   ];
 
-  const filteredImages = activeTab === "all" ? images : images.filter(img => img.category === activeTab);
+  const filteredImages = activeTab === "all" ? shuffledImages : shuffledImages.filter(img => img.category === activeTab);
 
   const openLightbox = (index: number) => setLightboxIndex(index);
   const closeLightbox = () => setLightboxIndex(null);
@@ -105,7 +111,7 @@ export default function Portfolio() {
             key={cat.id}
             onClick={() => {
               setActiveTab(cat.id);
-              setVisibleCount(6); // Reset on tab change
+              setVisibleCount(8); // Reset on tab change
             }}
             className={`flex-shrink-0 whitespace-nowrap px-5 py-2 rounded-full text-sm font-poppins font-semibold transition-all shadow-sm ${
               activeTab === cat.id
@@ -151,7 +157,7 @@ export default function Portfolio() {
       {visibleCount < filteredImages.length && (
         <div className="mt-8 text-center px-6">
           <button 
-            onClick={() => setVisibleCount(prev => prev + 6)}
+            onClick={() => setVisibleCount(prev => prev + 8)}
             className="bg-white border-2 border-brand-secondary text-brand-primary font-poppins font-bold py-3 px-8 rounded-full shadow-sm hover:bg-brand-secondary hover:text-white transition-all active:scale-95 text-sm"
           >
             Load More Photos ↓

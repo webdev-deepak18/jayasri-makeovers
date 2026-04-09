@@ -59,7 +59,7 @@ export default function Navbar() {
           }`}
           onClick={(e) => e.stopPropagation()} // Prevent clicking inside from closing it
         >
-          <nav className="flex flex-col gap-6">
+          <nav className="flex flex-col gap-4">
             {[
               { id: "pricing", label: t("nav.services") || "Services" },
               { id: "portfolio", label: t("nav.portfolio") || "Portfolio" },
@@ -74,10 +74,10 @@ export default function Navbar() {
                   setIsMenuOpen(false);
                   document.getElementById(link.id)?.scrollIntoView({ behavior: "smooth" });
                 }}
-                className="text-lg font-poppins font-bold text-neutral-800 border-b border-neutral-100 pb-3 active:text-brand-primary transition-colors flex items-center justify-between group"
+                className="text-lg font-poppins font-bold text-center text-brand-primary bg-brand-secondary/10 hover:bg-brand-secondary/20 border border-brand-secondary/20 rounded-xl py-3 shadow-sm active:scale-95 transition-all flex items-center justify-between px-5 group"
               >
                 <span>{link.label}</span>
-                <span className="text-brand-secondary opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-[-10px] group-hover:translate-x-0">→</span>
+                <span className="text-brand-secondary opacity-0 group-hover:opacity-100 transition-opacity transform -translate-x-2 group-hover:translate-x-0">→</span>
               </a>
             ))}
           </nav>
