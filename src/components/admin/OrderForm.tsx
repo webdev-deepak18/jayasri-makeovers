@@ -12,36 +12,53 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
   const isEditing = !!orderId;
   const isUpcoming = initialData?.status === "upcoming";
 
-  // Real-time calculation state
-  const [totalPrice, setTotalPrice] = useState<number>(initialData?.total_price || 0);
-  const [advanceAmount, setAdvanceAmount] = useState<number>(initialData?.advance_amount || 0);
+  type CostBlock = { id: string; invAmount: number; invDesc: string; clientAmount: number; clientDesc: string; };
 
-  // Dynamic expense line items
-  // We seed from existing data: travel_expense becomes a line item, then other_expenses with notes
-  const buildInitialExpenses = () => {
-    const items: { amount: number; description: string }[] = [];
+  const buildInitialBlocks = (): CostBlock[] => {
+    try {
+      if (initialData?.expense_notes?.startsWith("[{")) {
+        const parsed = JSON.parse(initialData.expense_notes);
+        if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].hasOwnProperty('invAmount')) {
+          return parsed;
+        }
+      }
+    } catch {}
+
+    const blocks: CostBlock[] = [];
     const travel = Number(initialData?.travel_expense || 0);
     const other = Number(initialData?.other_expenses || 0);
     const notes = initialData?.expense_notes || "";
-    if (travel > 0) items.push({ amount: travel, description: "Travel" });
-    if (other > 0) items.push({ amount: other, description: notes || "Other expenses" });
-    return items;
+
+    if (travel > 0) blocks.push({ id: Math.random().toString(), invAmount: travel, invDesc: "Travel", clientAmount: 0, clientDesc: "" });
+    if (other > 0) blocks.push({ id: Math.random().toString(), invAmount: other, invDesc: notes || "Other Expenses", clientAmount: 0, clientDesc: "" });
+    return blocks;
   };
-  const [expenseItems, setExpenseItems] = useState<{ amount: number; description: string }[]>(buildInitialExpenses);
-  const [showExpenseForm, setShowExpenseForm] = useState(expenseItems.length > 0);
 
-  const totalExpenses = expenseItems.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
-  // Travel = first item if description is "Travel", rest = other_expenses
-  const travelExpense = expenseItems.length > 0 && expenseItems[0].description.toLowerCase() === "travel" ? (Number(expenseItems[0].amount) || 0) : 0;
-  const otherExpenses = totalExpenses - travelExpense;
-  const expenseNotes = expenseItems.map(e => `${e.description}: ₹${e.amount}`).join(" | ");
+  const [costBlocks, setCostBlocks] = useState<CostBlock[]>(buildInitialBlocks);
 
-  const addExpenseItem = () => setExpenseItems(prev => [...prev, { amount: 0, description: "" }]);
-  const removeExpenseItem = (i: number) => setExpenseItems(prev => prev.filter((_, idx) => idx !== i));
-  const updateExpenseItem = (i: number, field: "amount" | "description", value: string | number) =>
-    setExpenseItems(prev => prev.map((e, idx) => idx === i ? { ...e, [field]: value } : e));
+  const totalInv = costBlocks.reduce((sum, b) => sum + (Number(b.invAmount) || 0), 0);
+  const totalClient = costBlocks.reduce((sum, b) => sum + (Number(b.clientAmount) || 0), 0);
 
-  const pendingAmount = Math.max(0, totalPrice - advanceAmount);
+  const calculateInitialBasePrice = () => {
+    const totalDDB = Number(initialData?.total_price || 0);
+    const initialClientParts = buildInitialBlocks().reduce((sum, b) => sum + (Number(b.clientAmount) || 0), 0);
+    return Math.max(0, totalDDB - initialClientParts);
+  };
+
+  const [basePrice, setBasePrice] = useState<number>(calculateInitialBasePrice);
+  const [advanceAmount, setAdvanceAmount] = useState<number>(initialData?.advance_amount || 0);
+
+  const computedTotalPrice = basePrice + totalClient;
+  const pendingAmount = Math.max(0, computedTotalPrice - advanceAmount);
+
+  const travelExpense = costBlocks.length > 0 ? (Number(costBlocks[0].invAmount) || 0) : 0;
+  const otherExpenses = totalInv - travelExpense;
+  const expenseNotes = JSON.stringify(costBlocks);
+
+  const addCostBlock = () => setCostBlocks(prev => [...prev, { id: Math.random().toString(), invAmount: 0, invDesc: "", clientAmount: 0, clientDesc: "" }]);
+  const removeCostBlock = (i: number) => setCostBlocks(prev => prev.filter((_, idx) => idx !== i));
+  const updateCostBlock = (i: number, field: keyof CostBlock, value: string | number) =>
+    setCostBlocks(prev => prev.map((e, idx) => idx === i ? { ...e, [field]: value } : e));
 
   // Quick Complete state
   const [showQuickComplete, setShowQuickComplete] = useState(false);
@@ -96,7 +113,7 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
       const result = isEditing
         ? await updateOrder(orderId, formData)
         : await createOrder(formData);
-      if (result.success) router.push("/admin/orders");
+      if (result.success) router.push("/admin/dashboard");
       else setError(result.error || "Failed to save order");
     });
   }
@@ -105,7 +122,7 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
     if (!confirm("Delete this order? This cannot be undone.")) return;
     startTransition(async () => {
       const result = await deleteOrder(orderId!);
-      if (result.success) router.push("/admin/orders");
+      if (result.success) router.push("/admin/dashboard");
       else setError(result.error || "Failed to delete");
     });
   }
@@ -165,7 +182,7 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div className="bg-white rounded-xl p-2.5 shadow-sm">
                   <p className="text-[9px] text-neutral-400 font-bold uppercase tracking-wider mb-0.5">Service</p>
-                  <p className="text-sm font-poppins font-bold text-neutral-800">₹{totalPrice.toLocaleString()}</p>
+                  <p className="text-sm font-poppins font-bold text-neutral-800">₹{computedTotalPrice.toLocaleString()}</p>
                 </div>
                 <div className="bg-white rounded-xl p-2.5 shadow-sm">
                   <p className="text-[9px] text-neutral-400 font-bold uppercase tracking-wider mb-0.5">Advance</p>
@@ -194,7 +211,7 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
                 </div>
                 {balanceInput > 0 && (
                   <p className="text-[11px] text-green-700 mt-1">
-                    Total received: ₹{(advanceAmount + balanceInput).toLocaleString()} / ₹{totalPrice.toLocaleString()}
+                    Total received: ₹{(advanceAmount + balanceInput).toLocaleString()} / ₹{computedTotalPrice.toLocaleString()}
                   </p>
                 )}
               </div>
@@ -213,8 +230,8 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
                 {isPending
                   ? "Saving..."
                   : balanceInput > 0
-                    ? `Collect ₹${balanceInput.toLocaleString()} & Mark Complete`
-                    : "Mark as Completed"}
+                  ? `Collect ₹${balanceInput.toLocaleString()} & Mark Complete`
+                  : "Mark as Completed"}
               </button>
             </div>
           )}
@@ -282,28 +299,32 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
                   key={opt.id}
                   type="button"
                   onClick={() => setMakeupType(opt.id)}
-                  className={`flex items-center gap-3 p-3.5 rounded-xl border-2 transition-all text-left group ${makeupType === opt.id
+                  className={`flex items-center gap-3 p-3.5 rounded-xl border-2 transition-all text-left group ${
+                    makeupType === opt.id
                       ? "border-brand-primary bg-brand-primary/5 ring-1 ring-brand-primary/20"
                       : "border-neutral-100 bg-neutral-50 hover:border-neutral-200 active:scale-[0.99]"
-                    }`}
+                  }`}
                 >
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl transition-colors ${makeupType === opt.id ? "bg-brand-primary text-white" : "bg-white text-neutral-400 border border-neutral-100"
-                    }`}>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl transition-colors ${
+                    makeupType === opt.id ? "bg-brand-primary text-white" : "bg-white text-neutral-400 border border-neutral-100"
+                  }`}>
                     {getMakeupIcon(opt.id)}
                   </div>
                   <div className="flex-grow">
-                    <h4 className={`text-sm font-bold transition-colors ${makeupType === opt.id ? "text-brand-primary" : "text-neutral-700"
-                      }`}>
+                    <h4 className={`text-sm font-bold transition-colors ${
+                      makeupType === opt.id ? "text-brand-primary" : "text-neutral-700"
+                    }`}>
                       {opt.id}
                     </h4>
-                    <p className={`text-[10px] uppercase font-medium tracking-wider transition-colors mt-0.5 ${makeupType === opt.id ? "text-brand-primary/60" : "text-neutral-400"
-                      }`}>
+                    <p className={`text-[10px] uppercase font-medium tracking-wider transition-colors mt-0.5 ${
+                      makeupType === opt.id ? "text-brand-primary/60" : "text-neutral-400"
+                    }`}>
                       {opt.desc}
                     </p>
                   </div>
                   {makeupType === opt.id && (
                     <div className="text-brand-primary">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                     </div>
                   )}
                 </button>
@@ -341,7 +362,7 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
                       type="button" onClick={() => removeDate(i)}
                       className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                     </button>
                   )}
                 </div>
@@ -350,7 +371,7 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
                 type="button" onClick={addDate}
                 className="text-xs font-bold text-brand-secondary hover:text-brand-primary flex items-center gap-1 transition-colors uppercase tracking-wide"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                 Add Date
               </button>
             </div>
@@ -373,11 +394,11 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-neutral-500 mb-1 uppercase tracking-wide">Service Price</label>
+            <label className="block text-xs font-semibold text-neutral-500 mb-1 uppercase tracking-wide">Base Service Price</label>
             <input
-              type="number" name="total_price" required min="0"
-              value={totalPrice || ""}
-              onChange={(e) => setTotalPrice(Number(e.target.value))}
+              type="number" required min="0"
+              value={basePrice || ""}
+              onChange={(e) => setBasePrice(Number(e.target.value))}
               className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:ring-1 focus:ring-brand-secondary outline-none font-poppins bg-neutral-50 font-bold text-neutral-800"
             />
           </div>
@@ -393,75 +414,90 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
           {/* ── Expenses Section ── */}
           <div className="col-span-2">
             {/* Hidden fields for server action */}
+            <input type="hidden" name="total_price" value={computedTotalPrice} />
             <input type="hidden" name="travel_expense" value={travelExpense} />
             <input type="hidden" name="other_expenses" value={otherExpenses} />
             <input type="hidden" name="expense_notes" value={expenseNotes} />
 
-            <div className="flex items-center justify-between mb-2">
-              <label className="block text-xs font-semibold text-neutral-500 uppercase tracking-wide">Expenses</label>
-              {!showExpenseForm && (
-                <button
-                  type="button"
-                  onClick={() => { setShowExpenseForm(true); if (expenseItems.length === 0) addExpenseItem(); }}
-                  className="text-xs font-bold text-brand-secondary hover:text-brand-primary flex items-center gap-1 transition-colors"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
-                  Add Expense
-                </button>
-              )}
+            <div className="flex items-center justify-between mb-3 mt-2">
+              <label className="block text-xs font-semibold text-neutral-500 uppercase tracking-wide">Additional Items (Travel, etc.)</label>
             </div>
 
-            {showExpenseForm && (
-              <div className="space-y-2">
-                {expenseItems.map((item, i) => (
-                  <div key={i} className="flex gap-2 items-center bg-amber-50 border border-amber-100 rounded-xl px-3 py-2">
-                    <span className="text-amber-700 font-bold text-sm shrink-0">₹</span>
-                    <input
-                      type="number"
-                      min="0"
-                      value={item.amount || ""}
-                      onChange={e => updateExpenseItem(i, "amount", Number(e.target.value))}
-                      placeholder="Amount"
-                      className="w-20 shrink-0 bg-transparent border-b border-amber-300 focus:border-amber-500 outline-none font-poppins font-bold text-amber-800 text-sm py-0.5"
-                    />
-                    <input
-                      type="text"
-                      value={item.description}
-                      onChange={e => updateExpenseItem(i, "description", e.target.value)}
-                      placeholder="Description (e.g. Hair clip)"
-                      className="flex-1 bg-transparent border-b border-amber-200 focus:border-amber-500 outline-none font-poppins text-amber-900 text-sm py-0.5 placeholder:text-amber-400"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeExpenseItem(i)}
-                      className="text-amber-400 hover:text-red-500 shrink-0 transition-colors"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
-                    </button>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={addExpenseItem}
-                  className="text-xs font-bold text-amber-600 hover:text-amber-800 flex items-center gap-1 transition-colors uppercase tracking-wide"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
-                  Add Another
-                </button>
-                {totalExpenses > 0 && (
-                  <p className="text-[10px] text-neutral-400">Total expenses: ₹{totalExpenses} (deducted from your net earnings)</p>
-                )}
-              </div>
-            )}
+            <div className="space-y-4">
+              {costBlocks.map((block, i) => (
+                <div key={block.id} className="bg-neutral-50 border border-neutral-200 rounded-2xl p-4 relative">
+                  <button type="button" onClick={() => removeCostBlock(i)} className="absolute top-3 right-3 text-red-500 hover:text-red-700 p-1 bg-white rounded-full shadow-sm hit-area z-10 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                  </button>
+                  
+                  <h4 className="font-bold text-neutral-700 mb-3 text-xs uppercase tracking-wider flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                    Additional Item #{i + 1}
+                  </h4>
+                  
+                  <div className="space-y-3">
+                    {/* Row 1: Investment */}
+                    <div className="bg-white p-3 rounded-xl border border-amber-200/60 shadow-sm relative overflow-hidden">
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-amber-400"></div>
+                      <label className="text-[10px] uppercase font-bold text-amber-800 mb-1 block tracking-wider">
+                        Investment (Business Cost)
+                      </label>
+                      <p className="text-[10px] text-neutral-400 mb-2 leading-tight">This amount will be deducted from your final profit calculation.</p>
+                      <div className="flex gap-2">
+                        <div className="relative w-28 shrink-0">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-amber-700">₹</span>
+                          <input type="number" min="0" value={block.invAmount || ""} onChange={e => updateCostBlock(i, "invAmount", Number(e.target.value))} placeholder="0" className="w-full pl-7 pr-2 py-2 border border-neutral-200 rounded-lg focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none text-sm font-bold text-amber-900 bg-amber-50/20" />
+                        </div>
+                        <input type="text" value={block.invDesc} onChange={e => updateCostBlock(i, "invDesc", e.target.value)} placeholder="Description (e.g. Travel, Flowers)" className="flex-1 px-3 py-2 border border-neutral-200 rounded-lg focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none text-sm text-neutral-700" />
+                      </div>
+                    </div>
 
-            {!showExpenseForm && totalExpenses === 0 && (
-              <p className="text-[11px] text-neutral-400">No expenses added. Tap above to add items like travel or accessories.</p>
+                    {/* Row 2: Client Price */}
+                    <div className="bg-white p-3 rounded-xl border border-blue-200/60 shadow-sm relative overflow-hidden">
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
+                      <label className="text-[10px] uppercase font-bold text-blue-800 mb-1 block tracking-wider">
+                        Client Price
+                      </label>
+                      <p className="text-[10px] text-neutral-400 mb-2 leading-tight">This amount will be automatically added to the Final Service Price.</p>
+                      <div className="flex gap-2">
+                        <div className="relative w-28 shrink-0">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-blue-700">₹</span>
+                          <input type="number" min="0" value={block.clientAmount || ""} onChange={e => updateCostBlock(i, "clientAmount", Number(e.target.value))} placeholder="0" className="w-full pl-7 pr-2 py-2 border border-neutral-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-sm font-bold text-blue-900 bg-blue-50/20" />
+                        </div>
+                        <input type="text" value={block.clientDesc} onChange={e => updateCostBlock(i, "clientDesc", e.target.value)} placeholder="Description shown to client" className="flex-1 px-3 py-2 border border-neutral-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-sm text-neutral-700" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              <button
+                type="button"
+                onClick={addCostBlock}
+                className="text-xs font-bold text-brand-secondary hover:text-brand-primary flex items-center gap-1 transition-colors uppercase tracking-wide bg-brand-secondary/5 px-4 py-2 rounded-lg"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                + Add Item
+              </button>
+            </div>
+
+            {costBlocks.length === 0 && (
+              <p className="text-[11px] text-neutral-400 mt-3">No additional items added. Tap above to add items like travel or accessories.</p>
             )}
           </div>
         </div>
 
         {/* Balance summary */}
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 mt-4">
+          <div className="flex justify-between items-center p-3 rounded-lg bg-neutral-50 border border-neutral-200 mb-2">
+             <span className="text-xs font-bold uppercase tracking-widest text-neutral-600">
+               Base + Client Additions
+             </span>
+             <span className="text-sm font-poppins font-bold text-neutral-800">
+               {basePrice > 0 ? `₹${basePrice}` : '0'} + {totalClient > 0 ? `₹${totalClient}` : '0'} = ₹{computedTotalPrice}
+             </span>
+          </div>
+
           <div className={`flex justify-between items-center p-3 rounded-lg ${pendingAmount > 0 ? "bg-red-50 border border-red-100" : "bg-green-50 border border-green-100"}`}>
             <span className={`text-xs font-bold uppercase tracking-widest ${pendingAmount > 0 ? "text-red-800" : "text-green-700"}`}>
               Pending Balance
@@ -470,16 +506,16 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
               {pendingAmount > 0 ? `₹${pendingAmount}` : "Paid in Full"}
             </span>
           </div>
-          {totalExpenses > 0 && (
+          {totalInv > 0 && (
             <div className="space-y-1">
               <div className="flex justify-between items-center px-3 py-2 rounded-lg bg-amber-50 border border-amber-100">
-                <span className="text-xs font-semibold text-amber-700 uppercase tracking-widest">Total Expenses</span>
-                <span className="text-sm font-poppins font-bold text-amber-700">₹{totalExpenses} (not in earnings)</span>
+                <span className="text-xs font-semibold text-amber-800 uppercase tracking-widest">Total Investment</span>
+                <span className="text-sm font-poppins font-bold text-amber-800">₹{totalInv} (Cost to you)</span>
               </div>
-              {expenseItems.filter(e => e.description).map((e, i) => (
-                <div key={i} className="flex justify-between items-center px-3 py-1 text-[11px] text-amber-600">
-                  <span>• {e.description}</span>
-                  <span className="font-semibold">₹{e.amount}</span>
+              {costBlocks.filter(e => e.invDesc || e.invAmount > 0).map(e => (
+                <div key={e.id} className="flex justify-between items-center px-3 py-1 text-[11px] text-amber-700">
+                  <span>• {e.invDesc || 'Bonus Item'}</span>
+                  <span className="font-semibold">₹{e.invAmount}</span>
                 </div>
               ))}
             </div>
