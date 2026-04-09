@@ -26,7 +26,7 @@ export default function Calendar({ bookedDates = [] }: { bookedDates?: string[] 
 
   if (!today) {
     return (
-      <section className="py-12 px-6 bg-brand-light" id="availability">
+      <section className="scroll-mt-20 py-12 px-6 bg-brand-light" id="calendar">
         <div className="text-center mb-8">
           <h3 className="font-playfair text-3xl font-bold text-brand-primary">
             {t("calendar.title")}
@@ -101,7 +101,7 @@ export default function Calendar({ bookedDates = [] }: { bookedDates?: string[] 
   });
 
   return (
-    <section className="py-12 px-6 bg-brand-light" id="availability">
+    <section className="scroll-mt-20 py-12 px-6 bg-brand-light" id="calendar">
       <div className="text-center mb-8">
         <h3 className="font-playfair text-3xl font-bold text-brand-primary">
           {t("calendar.title")}

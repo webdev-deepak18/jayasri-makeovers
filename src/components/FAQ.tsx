@@ -17,7 +17,7 @@ export default function FAQ() {
   ];
 
   return (
-    <section className="py-12 px-6 bg-white" id="faq">
+    <section className="scroll-mt-20 py-12 px-6 bg-white" id="faq">
       <div className="text-center mb-10">
         <h3 className="font-playfair text-3xl font-bold text-brand-primary">
           {t("faq.title") || "Frequently Asked Questions"}

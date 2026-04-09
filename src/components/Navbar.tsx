@@ -17,83 +17,97 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isMenuOpen]);
 
+  // Lock body scroll when menu is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+  }, [isMenuOpen]);
+
   return (
-    <nav className="flex items-center justify-between px-6 py-4 bg-brand-light/95 backdrop-blur-md sticky top-0 z-50 border-b border-brand-secondary/20">
-      <div className="flex items-center">
-        <h1 className="font-playfair font-bold text-xl text-brand-primary tracking-wide">
-          Jayasri <span className="text-brand-secondary">Makeovers</span>
-        </h1>
-      </div>
-      <div className="flex items-center gap-4">
-        <button 
-          onClick={toggleLang}
-          className="text-xs font-semibold px-3 py-1.5 rounded-full bg-white text-brand-primary border border-brand-secondary/30 shadow-sm transition-all hover:bg-brand-secondary/10"
-        >
-          {lang === 'en' ? 'EN | ಕನ್ನಡ' : 'ಕನ್ನಡ | EN'}
-        </button>
+    <>
+      <nav className={`flex items-center justify-between px-6 py-4 sticky top-0 z-50 border-b border-brand-secondary/20 shadow-sm transition-colors duration-300 ${isMenuOpen ? 'bg-[#fdf8f4]' : 'bg-brand-light/95 backdrop-blur-md'}`}>
+        <div className="flex items-center relative z-50">
+          <h1 className="font-playfair font-bold text-xl text-brand-primary tracking-wide">
+            Jayasri <span className="text-brand-secondary">Makeovers</span>
+          </h1>
+        </div>
+        
+        <div className="flex items-center gap-4 relative z-50">
+          <button 
+            onClick={toggleLang}
+            className="text-xs font-semibold px-3 py-1.5 rounded-full bg-white text-brand-primary border border-brand-secondary/30 shadow-sm transition-all hover:bg-brand-secondary/10"
+          >
+            {lang === 'en' ? 'EN | ಕನ್ನಡ' : 'ಕನ್ನಡ | EN'}
+          </button>
 
-        {/* Hamburger Icon */}
-        <button 
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="p-2 text-brand-primary active:scale-95 transition-transform relative z-50 bg-white rounded-full shadow-sm border border-brand-secondary/20"
-          aria-label="Toggle menu"
-        >
-          <div className="w-5 h-4 flex flex-col justify-between items-center overflow-hidden">
-            <span className={`w-full h-0.5 bg-current transform transition-all duration-300 origin-left ${isMenuOpen ? 'rotate-45 translate-x-px' : ''}`} />
-            <span className={`w-full h-0.5 bg-current transition-all duration-300 ${isMenuOpen ? 'opacity-0 translate-x-3' : ''}`} />
-            <span className={`w-full h-0.5 bg-current transform transition-all duration-300 origin-left ${isMenuOpen ? '-rotate-45 translate-x-px' : ''}`} />
-          </div>
-        </button>
-      </div>
+          {/* Hamburger Icon */}
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="p-2.5 text-brand-primary active:scale-95 transition-transform bg-white rounded-full shadow-sm border border-brand-secondary/20"
+            aria-label="Toggle menu"
+          >
+            <div className="w-5 h-4 flex flex-col justify-between items-center overflow-hidden">
+              <span className={`w-full h-0.5 bg-current transform transition-all duration-300 origin-left ${isMenuOpen ? 'rotate-45 translate-x-px translate-y-[-1px]' : ''}`} />
+              <span className={`w-full h-0.5 bg-current transition-all duration-300 ${isMenuOpen ? 'opacity-0 translate-x-3' : ''}`} />
+              <span className={`w-full h-0.5 bg-current transform transition-all duration-300 origin-left ${isMenuOpen ? '-rotate-45 translate-x-px translate-y-[1px]' : ''}`} />
+            </div>
+          </button>
+        </div>
+      </nav>
 
-      {/* Mobile Slide-over Menu */}
+      {/* Full Screen Mobile Menu */}
       <div 
-        className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity duration-300 ${
-          isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
+        className={`fixed inset-0 z-40 transition-all duration-300 ease-out flex flex-col pt-32 px-6 ${
+          isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
         }`}
-        onClick={() => setIsMenuOpen(false)}
+        style={{ backgroundColor: '#fdf8f4' }}
       >
-        <div 
-          className={`absolute top-0 right-0 w-64 h-full bg-white shadow-2xl transform transition-transform duration-300 ease-out flex flex-col pt-24 px-6 ${
-            isMenuOpen ? "translate-x-0" : "translate-x-full"
-          }`}
-          onClick={(e) => e.stopPropagation()} // Prevent clicking inside from closing it
-        >
-          <nav className="flex flex-col gap-4">
-            {[
-              { id: "pricing", label: t("nav.services") || "Services" },
-              { id: "portfolio", label: t("nav.portfolio") || "Portfolio" },
-              { id: "calendar", label: t("calendar.title") || "Availability" },
-              { id: "faq", label: "FAQ" },
-            ].map((link) => (
-              <a
-                key={link.id}
-                href={`#${link.id}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsMenuOpen(false);
-                  document.getElementById(link.id)?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="text-lg font-poppins font-bold text-center text-brand-primary bg-brand-secondary/10 hover:bg-brand-secondary/20 border border-brand-secondary/20 rounded-xl py-3 shadow-sm active:scale-95 transition-all flex items-center justify-between px-5 group"
-              >
-                <span>{link.label}</span>
-                <span className="text-brand-secondary opacity-0 group-hover:opacity-100 transition-opacity transform -translate-x-2 group-hover:translate-x-0">→</span>
-              </a>
-            ))}
-          </nav>
-          
-          <div className="mt-auto pb-10">
-            <a 
-              href="https://wa.me/918867052945"
-              target="_blank" rel="noopener noreferrer"
-              className="w-full bg-brand-primary text-white text-center py-3.5 rounded-xl font-bold tracking-wide shadow-md flex items-center justify-center gap-2"
-              onClick={() => setIsMenuOpen(false)}
+        <nav className="flex flex-col gap-6 items-center w-full max-w-sm mx-auto flex-1">
+          {[
+            { id: "pricing", label: t("nav.services") || "Services" },
+            { id: "portfolio", label: t("nav.portfolio") || "Portfolio" },
+            { id: "booking-info", label: "Trial & Booking" },
+            { id: "calendar", label: t("calendar.title") || "Availability" },
+            { id: "faq", label: "FAQ" },
+          ].map((link, idx) => (
+            <a
+              key={link.id}
+              href={`#${link.id}`}
+              style={{
+                transitionDelay: isMenuOpen ? `${idx * 50}ms` : '0ms'
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                setIsMenuOpen(false);
+                document.getElementById(link.id)?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className={`text-2xl font-playfair font-bold text-center text-brand-primary active:scale-95 transition-all w-full pb-4 border-b border-brand-secondary/10 ${
+                isMenuOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+              }`}
             >
-              <span>{t("nav.book") || "Book Now"}</span>
+              {link.label}
             </a>
-          </div>
+          ))}
+        </nav>
+        
+        <div 
+          className={`pb-12 w-full max-w-sm mx-auto transition-all duration-500 delay-300 ${
+            isMenuOpen ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+          }`}
+        >
+          <a 
+            href="https://wa.me/918867052945"
+            target="_blank" rel="noopener noreferrer"
+            className="w-full bg-brand-primary text-white text-center py-4 rounded-2xl font-poppins font-bold text-lg tracking-wide shadow-xl shadow-brand-primary/20 flex items-center justify-center gap-2 active:scale-95 transition-transform"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            <span>{t("nav.book") || "Book Now"}</span>
+          </a>
         </div>
       </div>
-    </nav>
+    </>
   );
 }

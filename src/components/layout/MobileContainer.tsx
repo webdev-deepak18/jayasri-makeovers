@@ -7,7 +7,8 @@ export default function MobileContainer({ children }: { children: React.ReactNod
         This is the core constraint. The app acts like a mobile app 
         on all devices. Max width (max-w-md) ensures a phone-like aspect ratio.
       */}
-      <div className="w-full max-w-md bg-white shadow-2xl relative min-h-screen overflow-x-hidden flex flex-col">
+        {/* overflow-x-hidden removed to fix sticky positioning on Navbar */}
+      <div className="w-full max-w-md bg-white shadow-2xl relative min-h-screen flex flex-col">
         {children}
         <StickyActionBar />
       </div>

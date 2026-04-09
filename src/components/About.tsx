@@ -7,7 +7,7 @@ export default function About() {
   const { t, lang } = useLanguage();
 
   return (
-    <section className="py-12 px-6 bg-brand-light" id="about">
+    <section className="scroll-mt-20 py-12 px-6 bg-brand-light" id="about">
       <div className="text-center mb-10">
         <h3 className="font-playfair text-3xl font-bold text-brand-primary">{t("about.title")}</h3>
         <div className="w-16 h-1 bg-brand-secondary mx-auto mt-4 rounded-full"></div>

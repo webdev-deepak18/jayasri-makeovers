@@ -7,24 +7,32 @@ import Image from "next/image";
 type Category = "all" | "bridal" | "hair" | "hd" | "engagement" | "simple" | "babyShower" | "reception";
 
 const images = [
+  // Initial few photos are makeup as requested
   { src: "/images/portfolio/bridal-01.webp", category: "bridal" },
   { src: "/images/portfolio/hd-01.webp", category: "hd" },
-  { src: "/images/portfolio/bridal-02.webp", category: "bridal" },
   { src: "/images/portfolio/engagement-01.webp", category: "engagement" },
   { src: "/images/portfolio/simple-01.webp", category: "simple" },
+  
+  // Scattering hairstyle photos in between
+  { src: "/images/portfolio/hair-01.webp", category: "hair" },
   { src: "/images/portfolio/reception-01.webp", category: "reception" },
   { src: "/images/portfolio/simple-02.webp", category: "simple" },
-  { src: "/images/portfolio/simple-03.webp", category: "simple" },
-  { src: "/images/portfolio/simple-04.webp", category: "simple" },
-  { src: "/images/portfolio/simple-05.webp", category: "simple" },
-  { src: "/images/portfolio/babyshower-01.webp", category: "babyShower" },
-  { src: "/images/portfolio/hair-01.webp", category: "hair" },
-  { src: "/images/portfolio/babyshower-02.webp", category: "babyShower" },
   { src: "/images/portfolio/hair-02.webp", category: "hair" },
+  
+  { src: "/images/portfolio/bridal-02.webp", category: "bridal" },
+  { src: "/images/portfolio/babyshower-01.webp", category: "babyShower" },
   { src: "/images/portfolio/hair-03.webp", category: "hair" },
+  
+  { src: "/images/portfolio/simple-03.webp", category: "simple" },
   { src: "/images/portfolio/hair-05.webp", category: "hair" },
+  { src: "/images/portfolio/simple-04.webp", category: "simple" },
+  
+  { src: "/images/portfolio/babyshower-02.webp", category: "babyShower" },
   { src: "/images/portfolio/hair-07.webp", category: "hair" },
+  
+  { src: "/images/portfolio/simple-05.webp", category: "simple" },
   { src: "/images/portfolio/hair-08.webp", category: "hair" },
+  
   { src: "/images/portfolio/hair-09.webp", category: "hair" },
   { src: "/images/portfolio/hair-10.webp", category: "hair" },
   { src: "/images/portfolio/hair-11.webp", category: "hair" },
@@ -32,14 +40,34 @@ const images = [
 
 export default function Portfolio() {
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState<Category>("bridal");
+  const [activeTab, setActiveTab] = useState<Category>("all");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const [visibleCount, setVisibleCount] = useState<number>(8);
+  const [visibleCount, setVisibleCount] = useState<number>(10);
   const [shuffledImages, setShuffledImages] = useState(images);
 
-  // Shuffle images on initial render to prevent hydration mismatch while achieving randomness
   useEffect(() => {
-    setShuffledImages([...images].sort(() => Math.random() - 0.5));
+    const shuffleArray = <T,>(array: T[]): T[] => {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    };
+
+    const hairImages = images.filter((img) => img.category === "hair");
+    const otherImages = images.filter((img) => img.category !== "hair");
+    
+    const shuffledOthers = shuffleArray(otherImages);
+    const shuffledHair = shuffleArray(hairImages);
+
+    // Ensure first 6 photos are non-hair
+    const firstOthers = shuffledOthers.slice(0, 6);
+    const remainingOthers = shuffledOthers.slice(6);
+
+    const remainingMixed = shuffleArray([...remainingOthers, ...shuffledHair]);
+    
+    setShuffledImages([...firstOthers, ...remainingMixed]);
   }, []);
 
   // Touch swipe tracking
@@ -98,7 +126,7 @@ export default function Portfolio() {
   };
 
   return (
-    <section className="py-12 bg-white relative" id="portfolio">
+    <section className="scroll-mt-20 py-12 bg-white relative" id="portfolio">
       <div className="text-center mb-8 px-6">
         <h3 className="font-playfair text-3xl font-bold text-brand-primary">{t("portfolio.title")}</h3>
         <div className="w-16 h-1 bg-brand-secondary mx-auto mt-4 rounded-full"></div>

@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Pricing from "@/components/Pricing";
 import Portfolio from "@/components/Portfolio";
+import BookingInfo from "@/components/BookingInfo";
 import Calendar from "@/components/Calendar";
 import Testimonial from "@/components/Testimonial";
 import About from "@/components/About";
@@ -18,6 +19,7 @@ export default async function Home() {
       <Hero />
       <Pricing />
       <Portfolio />
+      <BookingInfo />
       <Calendar bookedDates={bookedDates} />
       <Testimonial />
       <About />

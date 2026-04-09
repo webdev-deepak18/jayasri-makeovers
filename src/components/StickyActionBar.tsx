@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/context/LanguageContext";
+import { usePathname } from "next/navigation";
 
 export default function StickyActionBar() {
   const { t } = useLanguage();
+  const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -22,6 +24,9 @@ export default function StickyActionBar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Do not render on admin routes
+  if (pathname?.startsWith("/admin")) return null;
 
   if (!isVisible) return null;
 
