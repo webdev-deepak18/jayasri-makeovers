@@ -1,11 +1,12 @@
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-  return [
-    {
+  return {
+    rules: {
       userAgent: '*',
       allow: '/',
       disallow: '/admin/',
     },
-  ];
+    sitemap: 'https://www.jayasrimakeovers.in/sitemap.xml',
+  };
 }
