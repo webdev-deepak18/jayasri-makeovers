@@ -34,6 +34,7 @@ export default function Portfolio() {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<Category>("all");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [visibleCount, setVisibleCount] = useState<number>(6);
 
   // Touch swipe tracking
   const touchStartX = useRef<number>(0);
@@ -102,7 +103,10 @@ export default function Portfolio() {
         {categories.map((cat) => (
           <button
             key={cat.id}
-            onClick={() => setActiveTab(cat.id)}
+            onClick={() => {
+              setActiveTab(cat.id);
+              setVisibleCount(6); // Reset on tab change
+            }}
             className={`flex-shrink-0 whitespace-nowrap px-5 py-2 rounded-full text-sm font-poppins font-semibold transition-all shadow-sm ${
               activeTab === cat.id
                 ? "bg-brand-secondary text-white shadow-md scale-105"
@@ -117,10 +121,10 @@ export default function Portfolio() {
 
       {/* Masonry-style Grid (CSS Columns) */}
       <div className="px-6 columns-2 gap-4 space-y-4">
-        {filteredImages.map((img, idx) => (
+        {filteredImages.slice(0, visibleCount).map((img, idx) => (
           <div 
             key={`${img.src}-${idx}`} 
-            className="relative w-full rounded-2xl overflow-hidden shadow-sm inline-block group cursor-pointer"
+            className="relative w-full rounded-2xl overflow-hidden shadow-sm inline-block group cursor-pointer animate-in fade-in zoom-in duration-500"
             onClick={() => openLightbox(idx)}
           >
             <Image
@@ -142,6 +146,18 @@ export default function Portfolio() {
           </div>
         ))}
       </div>
+
+      {/* Load More Button */}
+      {visibleCount < filteredImages.length && (
+        <div className="mt-8 text-center px-6">
+          <button 
+            onClick={() => setVisibleCount(prev => prev + 6)}
+            className="bg-white border-2 border-brand-secondary text-brand-primary font-poppins font-bold py-3 px-8 rounded-full shadow-sm hover:bg-brand-secondary hover:text-white transition-all active:scale-95 text-sm"
+          >
+            Load More Photos ↓
+          </button>
+        </div>
+      )}
 
       {/* Lightbox Modal */}
       {lightboxIndex !== null && (

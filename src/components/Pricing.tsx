@@ -55,11 +55,21 @@ export default function Pricing() {
 
       </div>
 
+      {/* Booking Terms Box */}
+      <div className="bg-gradient-to-r from-brand-primary/10 to-brand-secondary/10 border-2 border-brand-primary/20 rounded-2xl p-6 mt-10 text-center shadow-sm">
+        <h4 className="font-playfair text-xl font-bold text-brand-primary mb-3">
+          {t("about.advanceTitle") || "Secure Your Special Day! 💖"}
+        </h4>
+        <p className="text-sm text-neutral-700 leading-relaxed max-w-md mx-auto">
+          {t("about.advanceFriendly") || "To ensure you receive my absolute full attention on your special day, I take a 50% advance to secure your booking. Once confirmed, I completely block my calendar and decline other requests for your slot!"}
+        </p>
+      </div>
+
       {/* Travel Notice (Moved to bottom) */}
-      <div className="bg-brand-secondary/10 border border-brand-secondary/30 rounded-2xl p-4 mt-8 flex items-start gap-3 shadow-sm text-left">
+      <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-4 mt-6 flex items-start gap-3 shadow-sm text-left">
         <span className="text-xl">🚗</span>
-        <p className="text-sm text-neutral-700 font-medium leading-relaxed">
-          <span className="font-bold text-brand-primary">Travel Notice: </span>
+        <p className="text-sm text-neutral-600 font-medium leading-relaxed">
+          <span className="font-bold text-neutral-800">Travel Notice: </span>
           {t("about.travel")}
         </p>
       </div>

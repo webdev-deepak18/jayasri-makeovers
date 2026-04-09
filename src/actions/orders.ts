@@ -15,6 +15,7 @@ export interface DashboardStats {
   /** All advance amounts received so far (cash in hand) */
   cashCollected: number;
   totalTravelExpense: number;
+  totalOtherExpense: number;
   /** totalEarned logic applied to this month's events only */
   earningsThisMonth: number;
   openOrdersCount: number;
@@ -35,6 +36,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   let pendingToCollect = 0;
   let cashCollected = 0;
   let totalTravelExpense = 0;
+  let totalOtherExpense = 0;
   let earningsThisMonth = 0;
   let openOrdersCount = 0;
   let completedOrdersCount = 0;
@@ -46,16 +48,19 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       const advance = Number(o.advance_amount || 0);
       const total = Number(o.total_price || 0);
       const travel = Number(o.travel_expense || 0);
+      const other = Number(o.other_expenses || 0);
+      
       cashCollected += advance;
       totalTravelExpense += travel;
+      totalOtherExpense += other;
 
       const dates = o.date ? o.date.split(',').map((d: string) => d.trim()).sort() : [];
       const firstDate = dates[0] || '';
       const lastDate = dates[dates.length - 1] || '';
 
       if (o.status === 'completed') {
-        // Completed: service price minus travel (travel is pass-through, not Jayasri's income)
-        const serviceEarned = total - travel;
+        // Completed: service price minus pass-throughs
+        const serviceEarned = total - travel - other;
         totalEarned += serviceEarned;
         completedOrdersCount++;
         completedList.push(o);
@@ -97,6 +102,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     pendingToCollect,
     cashCollected,
     totalTravelExpense,
+    totalOtherExpense,
     earningsThisMonth,
     openOrdersCount,
     completedOrdersCount,
@@ -160,6 +166,7 @@ export async function createOrder(formData: FormData) {
     total_price: parseFloat(formData.get("total_price") as string) || 0,
     advance_amount: parseFloat(formData.get("advance_amount") as string) || 0,
     travel_expense: parseFloat(formData.get("travel_expense") as string) || 0,
+    other_expenses: parseFloat(formData.get("other_expenses") as string) || 0,
     custom_message: formData.get("custom_message") as string,
     status: (formData.get("status") as string) || "upcoming",
   };
@@ -181,6 +188,7 @@ export async function updateOrder(id: string, formData: FormData) {
     total_price: parseFloat(formData.get("total_price") as string) || 0,
     advance_amount: parseFloat(formData.get("advance_amount") as string) || 0,
     travel_expense: parseFloat(formData.get("travel_expense") as string) || 0,
+    other_expenses: parseFloat(formData.get("other_expenses") as string) || 0,
     custom_message: formData.get("custom_message") as string,
     status: (formData.get("status") as string) || "upcoming",
   };

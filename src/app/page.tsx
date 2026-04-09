@@ -5,6 +5,7 @@ import Portfolio from "@/components/Portfolio";
 import Calendar from "@/components/Calendar";
 import Testimonial from "@/components/Testimonial";
 import About from "@/components/About";
+import FAQ from "@/components/FAQ";
 import Footer from "@/components/Footer";
 import { getPublicBookedDates } from "@/actions/orders";
 
@@ -20,6 +21,7 @@ export default async function Home() {
       <Calendar bookedDates={bookedDates} />
       <Testimonial />
       <About />
+      <FAQ />
       <div className="h-10 bg-brand-light w-full"></div> {/* Spacer for fixed whatsapp button if added later */}
       <Footer />
     </main>

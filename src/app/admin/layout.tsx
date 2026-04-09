@@ -6,13 +6,13 @@ import {
   HomeIcon, 
   ClipboardDocumentListIcon, 
   UsersIcon, 
-  PlusCircleIcon 
+  CalendarIcon 
 } from "@heroicons/react/24/outline";
 import { 
   HomeIcon as HomeIconSolid, 
   ClipboardDocumentListIcon as ClipboardSolid, 
   UsersIcon as UsersSolid, 
-  PlusCircleIcon as PlusSolid 
+  CalendarIcon as CalendarSolid 
 } from "@heroicons/react/24/solid";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -25,9 +25,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const tabs = [
     { name: "Dashboard", href: "/admin/dashboard", icon: HomeIcon, iconActive: HomeIconSolid },
+    { name: "Calendar", href: "/admin/calendar", icon: CalendarIcon, iconActive: CalendarSolid },
     { name: "Orders", href: "/admin/orders", icon: ClipboardDocumentListIcon, iconActive: ClipboardSolid },
     { name: "Clients", href: "/admin/clients", icon: UsersIcon, iconActive: UsersSolid },
-    { name: "New", href: "/admin/orders/new", icon: PlusCircleIcon, iconActive: PlusSolid },
   ];
 
   return (

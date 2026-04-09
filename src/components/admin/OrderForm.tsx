@@ -16,6 +16,7 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
   const [totalPrice, setTotalPrice] = useState<number>(initialData?.total_price || 0);
   const [advanceAmount, setAdvanceAmount] = useState<number>(initialData?.advance_amount || 0);
   const [travelExpense, setTravelExpense] = useState<number>(initialData?.travel_expense || 0);
+  const [otherExpenses, setOtherExpenses] = useState<number>(initialData?.other_expenses || 0);
 
   const pendingAmount = Math.max(0, totalPrice - advanceAmount);
 
@@ -207,7 +208,6 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
         {/* Hidden inputs */}
         <input type="hidden" name="makeup_type" value={finalMakeupType} />
         <input type="hidden" name="date" value={finalDatesString} />
-        <input type="hidden" name="travel_expense" value={travelExpense} />
 
         {error && !showQuickComplete && (
           <div className="p-3 bg-red-50 text-red-600 border border-red-100 rounded-lg text-sm text-center">
@@ -373,15 +373,27 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
           </div>
           <div className="col-span-2">
             <label className="block text-xs font-semibold text-neutral-500 mb-1 uppercase tracking-wide">Expenses (Travel, Other etc)</label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 font-bold text-sm">₹</span>
-              <input
-                type="number" min="0"
-                value={travelExpense || ""}
-                onChange={(e) => setTravelExpense(Number(e.target.value))}
-                placeholder="0"
-                className="w-full pl-7 pr-3 py-2 border border-amber-200 rounded-lg focus:ring-1 focus:ring-amber-400 outline-none font-poppins bg-amber-50 text-amber-800 font-bold"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 font-bold text-sm">₹</span>
+                <input
+                  type="number" min="0" name="travel_expense"
+                  value={travelExpense || ""}
+                  onChange={(e) => setTravelExpense(Number(e.target.value))}
+                  placeholder="Travel"
+                  className="w-full pl-7 pr-3 py-2 border border-amber-200 rounded-lg focus:ring-1 focus:ring-amber-400 outline-none font-poppins bg-amber-50 text-amber-800 font-bold text-sm"
+                />
+              </div>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 font-bold text-sm">₹</span>
+                <input
+                  type="number" min="0" name="other_expenses"
+                  value={otherExpenses || ""}
+                  onChange={(e) => setOtherExpenses(Number(e.target.value))}
+                  placeholder="Other (e.g. Accs)"
+                  className="w-full pl-7 pr-3 py-2 border border-amber-200 rounded-lg focus:ring-1 focus:ring-amber-400 outline-none font-poppins bg-amber-50 text-amber-800 font-bold text-sm"
+                />
+              </div>
             </div>
             <p className="text-[10px] text-neutral-400 mt-1">Reimbursed expenses — not counted in your turnover</p>
           </div>
@@ -397,10 +409,10 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
               {pendingAmount > 0 ? `₹${pendingAmount}` : "Paid in Full"}
             </span>
           </div>
-          {travelExpense > 0 && (
+          {(travelExpense > 0 || otherExpenses > 0) && (
             <div className="flex justify-between items-center px-3 py-2 rounded-lg bg-amber-50 border border-amber-100">
               <span className="text-xs font-semibold text-amber-700 uppercase tracking-widest">Expenses</span>
-              <span className="text-sm font-poppins font-bold text-amber-700">₹{travelExpense} (not in turnover)</span>
+              <span className="text-sm font-poppins font-bold text-amber-700">₹{(travelExpense + otherExpenses)} (not in turnover)</span>
             </div>
           )}
         </div>

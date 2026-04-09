@@ -46,10 +46,8 @@ export default function About() {
           {/* Travel charges moved to Pricing.tsx */}
           <div className="flex gap-4 items-start bg-neutral-50 p-4 rounded-2xl border border-neutral-100">
             <span className="text-2xl mt-0.5">📅</span>
-            <p className="text-sm text-neutral-600 leading-relaxed font-medium">
-              Secure your date with a{" "}
-              <span className="font-bold text-brand-primary">50% advance</span>{" "}
-              — your slot is reserved exclusively for you.
+            <p className="text-sm text-neutral-600 leading-relaxed font-medium transition-all">
+              {t("about.advanceFriendly") || "Secure your date with a 50% advance — your slot is reserved exclusively for you."}
             </p>
           </div>
         </div>
