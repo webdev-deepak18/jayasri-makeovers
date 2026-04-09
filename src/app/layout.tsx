@@ -16,8 +16,42 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Jayasri Makeovers | Bangalore",
-  description: "Certified makeup artistry, from Bangalore's heart to yours.",
+  metadataBase: new URL('https://www.jayasrimakeovers.in'),
+  title: "Jayasri Makeovers | Makeup & Saree Draping in Bangalore",
+  description: "Professional makeup artist in Bangalore specializing in simple makeovers, party makeup, saree draping, hairstyling, and HD bridal makeup.",
+  keywords: ["makeup artist bangalore", "saree draping bangalore", "simple makeup bangalore", "party makeup artist", "woman hairstyle", "bridal makeup artist bangalore", "hd bridal makeup", "jayasri makeovers"],
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: "Jayasri Makeovers | Makeup & Saree Draping in Bangalore",
+    description: "Professional makeup artist in Bangalore specializing in simple makeovers, party makeup, saree draping, hairstyling, and HD bridal makeup.",
+    url: "https://www.jayasrimakeovers.in",
+    siteName: "Jayasri Makeovers",
+    locale: "en_IN",
+    type: "website",
+  },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "HealthAndBeautyBusiness",
+  "name": "Jayasri Makeovers",
+  "image": "https://www.jayasrimakeovers.in/images/portfolio/hd-01.webp",
+  "url": "https://www.jayasrimakeovers.in",
+  "telephone": "+918867052945",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Bangalore",
+    "addressRegion": "Karnataka",
+    "addressCountry": "IN"
+  },
+  "description": "Professional makeup artist in Bangalore specializing in simple makeovers, party makeup, saree draping, hairstyling, and HD bridal makeup.",
+  "priceRange": "₹₹",
+  "founder": {
+    "@type": "Person",
+    "name": "Jayasri"
+  }
 };
 
 export default function RootLayout({
@@ -27,6 +61,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body
         className={`${playfair.variable} ${poppins.variable} antialiased bg-neutral-100 text-neutral-900`}
       >

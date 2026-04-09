@@ -23,9 +23,10 @@ export default function Hero() {
       </div>
       
       <div className="relative z-10 w-full px-8 text-center flex flex-col items-center">
-        <h2 className="font-playfair text-[28px] leading-tight md:text-4xl text-white font-medium mb-6 drop-shadow-md">
-          {t("hero.tagline")}
-        </h2>
+        <h1 className="flex flex-col gap-2 font-playfair text-[28px] leading-tight md:text-4xl text-white font-medium mb-6 drop-shadow-md">
+          <span>{t("hero.title")}</span>
+          <span className="font-poppins text-base md:text-xl font-light text-white/90 drop-shadow-sm">{t("hero.subtitle")}</span>
+        </h1>
         
         <a 
           href="https://wa.me/918867052945?text=Hi%20Jayasri!%20I%20found%20you%20on%20Instagram%20and%20would%20love%20to%20book%20a%20makeover.%20Can%20you%20share%20your%20availability%20and%20package%20details%3F%20%F0%9F%92%84" 

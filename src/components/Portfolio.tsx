@@ -163,7 +163,7 @@ export default function Portfolio() {
           >
             <Image
               src={img.src}
-              alt={`Jayasri Makeovers ${img.category}`}
+              alt={`Jayasri Makeovers - Professional ${img.category} makeup and hairstyling in Bangalore`}
               width={400}
               height={600}
               className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105 protect-image"
