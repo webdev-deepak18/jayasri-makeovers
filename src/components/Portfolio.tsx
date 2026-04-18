@@ -9,12 +9,14 @@ type Category = "all" | "bridal" | "hair" | "hd" | "engagement" | "simple" | "ba
 const images = [
   // Initial few photos are makeup as requested
   { src: "/images/portfolio/bridal-01.webp", category: "bridal" },
+  { src: "/images/portfolio/bridal-03.webp", category: "bridal" },
   { src: "/images/portfolio/hd-01.webp", category: "hd" },
   { src: "/images/portfolio/engagement-01.webp", category: "engagement" },
   { src: "/images/portfolio/simple-01.webp", category: "simple" },
   
   // Scattering hairstyle photos in between
   { src: "/images/portfolio/hair-01.webp", category: "hair" },
+  { src: "/images/portfolio/hair-12.webp", category: "hair" },
   { src: "/images/portfolio/reception-01.webp", category: "reception" },
   { src: "/images/portfolio/simple-02.webp", category: "simple" },
   { src: "/images/portfolio/hair-02.webp", category: "hair" },
