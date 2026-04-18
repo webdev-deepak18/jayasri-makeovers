@@ -19,6 +19,33 @@ export default function Calendar({ bookedDates = [] }: { bookedDates?: string[] 
 
   const [today, setToday] = useState<Date | null>(null);
   const [activeMonth, setActiveMonth] = useState(0); // 0, 1, or 2
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && activeMonth < 2) {
+      setActiveMonth((prev) => prev + 1);
+    }
+    if (isRightSwipe && activeMonth > 0) {
+      setActiveMonth((prev) => prev - 1);
+    }
+  };
 
   useEffect(() => {
     setToday(getTodayIST());
@@ -131,7 +158,12 @@ export default function Calendar({ bookedDates = [] }: { bookedDates?: string[] 
       </div>
 
       {/* Single Calendar */}
-      <div className="bg-white rounded-3xl p-5 shadow-sm border border-neutral-100 max-w-sm mx-auto">
+      <div 
+        className="bg-white rounded-3xl p-5 shadow-sm border border-neutral-100 max-w-sm mx-auto touch-pan-y"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
         <div className="grid grid-cols-7 gap-2 mb-2">
           {weekDays.map((day) => (
             <div key={day} className="text-center text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
