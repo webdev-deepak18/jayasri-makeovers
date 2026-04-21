@@ -1,4 +1,5 @@
-import { getDashboardStats } from "@/actions/orders";
+import { getDashboardStats, getPublicBookedDates } from "@/actions/orders";
+import Calendar from "@/components/Calendar";
 import Link from "next/link";
 import { format } from "date-fns";
 import { getMakeupIcon } from "@/lib/makeup-utils";
@@ -11,6 +12,7 @@ export default async function DashboardPage({
   searchParams: Promise<{ tab?: string }>;
 }) {
   const stats = await getDashboardStats();
+  const bookedDates = await getPublicBookedDates();
   const params = await searchParams;
 
   // Smart default: open if there are open orders, else closed
@@ -71,7 +73,6 @@ export default async function DashboardPage({
             <p className="text-lg font-poppins font-bold text-neutral-700">{stats.completedOrdersCount}</p>
           </div>
         </div>
-
 
         {/* Travel expenses — only show if any */}
         {stats.totalTravelExpense > 0 && (
@@ -162,8 +163,10 @@ export default async function DashboardPage({
                   : [];
                 const firstDate = allDates[0] ? new Date(allDates[0]) : new Date();
                 const extraDates = allDates.length - 1;
-                const pendingAmt = Number(order.total_price) - Number(order.advance_amount);
-                const isFullyPaid = pendingAmt <= 0;
+                const netServicePrice = Number(order.total_price);
+                const advance = Number(order.advance_amount || 0);
+                const netPending = Math.max(0, netServicePrice - advance);
+                const isFullyPaid = netPending <= 0;
 
                 return (
                   <Link
@@ -192,16 +195,18 @@ export default async function DashboardPage({
                       <p className="text-[11px] text-neutral-400 truncate">{getMakeupIcon(order.makeup_type)} {order.makeup_type} · {order.location}</p>
                     </div>
 
-                    {/* Amount */}
+                    {/* Amount — earnings page style */}
                     <div className="flex-shrink-0 text-right ml-2">
-                      {activeTab === "closed" ? (
-                        <p className="text-sm font-bold text-green-600">₹{Number(order.total_price).toLocaleString()}</p>
-                      ) : isFullyPaid ? (
-                        <p className="text-xs font-bold text-green-600">Paid ✓</p>
+                      {activeTab === "closed" || isFullyPaid ? (
+                        <>
+                          <p className="text-sm font-bold text-green-600">₹{netServicePrice.toLocaleString()}</p>
+                          <p className="text-[9px] font-semibold text-green-400">fully paid</p>
+                        </>
                       ) : (
                         <>
-                          <p className="text-sm font-bold text-red-500">₹{pendingAmt.toLocaleString()}</p>
-                          <p className="text-[9px] text-red-400">due</p>
+                          <p className="text-[9px] font-semibold text-amber-400 mb-0.5">pending</p>
+                          <p className="text-sm font-bold text-amber-500 leading-none">₹{netPending.toLocaleString()}</p>
+                          <p className="text-[9px] text-neutral-400 mt-1">₹{advance.toLocaleString()} adv</p>
                         </>
                       )}
                     </div>
@@ -226,12 +231,19 @@ export default async function DashboardPage({
         </Link>
       </div>
 
+      {/* ── Calendar Section ── */}
+      <div className="pt-2">
+        <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden p-2">
+          <Calendar bookedDates={bookedDates} />
+        </div>
+      </div>
+
       {/* Front-end live site link */}
-      <div className="pt-4 text-center">
-        <a 
-          href="/" 
-          target="_blank" 
-          rel="noopener noreferrer" 
+      <div className="pt-4 text-center pb-6">
+        <a
+          href="/"
+          target="_blank"
+          rel="noopener noreferrer"
           className="inline-flex items-center justify-center gap-1.5 text-[12px] font-semibold text-neutral-400 hover:text-brand-primary transition-colors"
         >
           jayasrimakeovers.in

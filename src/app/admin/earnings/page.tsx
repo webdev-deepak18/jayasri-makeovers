@@ -26,6 +26,7 @@ export default async function EarningsPage({
     }),
     earnings: 0,
     pendingAmount: 0,
+    totalExpenses: 0,
     completedCount: 0,
     upcomingCount: 0,
     orders: [],
@@ -66,7 +67,7 @@ export default async function EarningsPage({
   const totalAllTime = months.reduce((sum, m) => sum + m.earnings, 0);
   const bestMonth = months.reduce(
     (best, m) => (m.earnings > best.earnings ? m : best),
-    { month: "", label: "—", earnings: 0, pendingAmount: 0, completedCount: 0, upcomingCount: 0, orders: [] } as MonthEarnings
+    { month: "", label: "—", earnings: 0, pendingAmount: 0, totalExpenses: 0, completedCount: 0, upcomingCount: 0, orders: [] } as MonthEarnings
   );
 
   // Sort selected orders by date
@@ -160,6 +161,17 @@ export default async function EarningsPage({
           </div>
         )}
       </div>
+
+      {/* Month Expenses */}
+      {selected.totalExpenses > 0 && (
+        <div className="flex items-center justify-between bg-neutral-50 border border-neutral-200 px-4 py-3 rounded-xl">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">Expenses This Month</p>
+            <p className="text-[10px] text-neutral-400 mt-0.5">Travel + other costs — not in earnings</p>
+          </div>
+          <p className="text-lg font-poppins font-bold text-neutral-600">₹{selected.totalExpenses.toLocaleString("en-IN")}</p>
+        </div>
+      )}
 
       {/* All-Time Summary */}
       <div className="grid grid-cols-2 gap-3">
@@ -310,9 +322,10 @@ export default async function EarningsPage({
                   : [];
                 const firstDate = allDates[0] ? new Date(allDates[0]) : new Date();
                 const isCompleted = order.status === "completed";
-                const earning = isCompleted
-                  ? Number(order.total_price) - Number(order.travel_expense || 0) - Number(order.other_expenses || 0)
-                  : Number(order.advance_amount || 0);
+                const netServicePrice = Number(order.total_price);
+                const advance = Number(order.advance_amount || 0);
+                const netPending = Math.max(0, netServicePrice - advance);
+                const isFullyPaid = netPending <= 0;
 
                 return (
                   <Link
@@ -336,21 +349,18 @@ export default async function EarningsPage({
                     </div>
 
                     <div className="flex-shrink-0 text-right ml-2">
-                      <p className={`text-sm font-bold ${isCompleted ? "text-green-600" : "text-brand-primary"}`}>
-                        ₹{earning.toLocaleString("en-IN")}
-                      </p>
-                      <p className={`text-[9px] font-semibold ${isCompleted ? "text-green-400" : "text-brand-secondary"}`}>
-                        {isCompleted ? "earned" : "advance"}
-                      </p>
-                      {!isCompleted && (() => {
-                        const netServicePrice = Number(order.total_price) - Number(order.travel_expense || 0) - Number(order.other_expenses || 0);
-                        const pending = Math.max(0, netServicePrice - Number(order.advance_amount || 0));
-                        return pending > 0 ? (
-                          <p className="text-[9px] font-semibold text-amber-500">
-                            ₹{pending.toLocaleString("en-IN")} due
-                          </p>
-                        ) : null;
-                      })()}
+                      {isCompleted || isFullyPaid ? (
+                        <>
+                          <p className="text-sm font-bold text-green-600">₹{netServicePrice.toLocaleString("en-IN")}</p>
+                          <p className="text-[9px] font-semibold text-green-400">fully paid</p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-[9px] font-semibold text-amber-400 mb-0.5">pending</p>
+                          <p className="text-sm font-bold text-amber-500 leading-none">₹{netPending.toLocaleString("en-IN")}</p>
+                          <p className="text-[9px] text-neutral-400 mt-1">₹{advance.toLocaleString("en-IN")} adv</p>
+                        </>
+                      )}
                     </div>
 
                     <svg className="w-4 h-4 text-neutral-300 ml-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

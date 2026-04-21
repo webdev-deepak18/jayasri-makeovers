@@ -48,8 +48,11 @@ export default async function OrdersPage({
           const allDates = order.date ? order.date.split(',').map((d: string) => d.trim()).sort() : [];
           const firstDate = allDates[0] ? new Date(allDates[0]) : new Date();
           const extraDates = allDates.length - 1;
-          const pendingAmount = Number(order.total_price) - Number(order.advance_amount);
-          const isPending = pendingAmount > 0;
+          const netServicePrice = Number(order.total_price);
+          const advance = Number(order.advance_amount || 0);
+          const netPending = Math.max(0, netServicePrice - advance);
+          const isCompleted = order.status === 'completed';
+          const isFullyPaid = netPending <= 0;
 
           return (
             <Link href={`/admin/orders/${order.id}/edit`} key={order.id} className="block">
@@ -77,11 +80,17 @@ export default async function OrdersPage({
                       </span>
                     </div>
                     <div className="text-right">
-                      <p className="text-[10px] text-neutral-400 font-semibold mb-0.5 uppercase tracking-wide">Advance: ₹{order.advance_amount}</p>
-                      {isPending ? (
-                        <p className="text-sm font-bold text-red-500 line-clamp-1">₹{pendingAmount} Due</p>
+                      {isCompleted || isFullyPaid ? (
+                        <>
+                          <p className="text-sm font-bold text-green-600">₹{netServicePrice.toLocaleString()}</p>
+                          <p className="text-[9px] font-semibold text-green-400">fully paid</p>
+                        </>
                       ) : (
-                        <p className="text-sm font-bold text-green-600">Paid in Full</p>
+                        <>
+                          <p className="text-[9px] font-semibold text-amber-400 mb-0.5">pending</p>
+                          <p className="text-sm font-bold text-amber-500 leading-none">₹{netPending.toLocaleString()}</p>
+                          <p className="text-[9px] text-neutral-400 mt-1">₹{advance.toLocaleString()} adv</p>
+                        </>
                       )}
                     </div>
                   </div>

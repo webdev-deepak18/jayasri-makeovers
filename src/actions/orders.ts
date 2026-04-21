@@ -244,6 +244,8 @@ export interface MonthEarnings {
   earnings: number;
   /** Balance still to collect on upcoming orders this month */
   pendingAmount: number;
+  /** Travel + other expenses for this month */
+  totalExpenses: number;
   completedCount: number;
   upcomingCount: number;
   orders: any[];
@@ -259,7 +261,7 @@ export async function getMonthlyEarnings(): Promise<MonthEarnings[]> {
   if (!allOrders || allOrders.length === 0) return [];
 
   // Build a map: "YYYY-MM" -> accumulated data
-  const map = new Map<string, { earnings: number; pendingAmount: number; completedCount: number; upcomingCount: number; orders: any[] }>();
+  const map = new Map<string, { earnings: number; pendingAmount: number; totalExpenses: number; completedCount: number; upcomingCount: number; orders: any[] }>();
 
   // Determine range boundaries
   let minMonth = "9999-99";
@@ -276,7 +278,7 @@ export async function getMonthlyEarnings(): Promise<MonthEarnings[]> {
     if (month > maxMonth) maxMonth = month;
 
     if (!map.has(month)) {
-      map.set(month, { earnings: 0, pendingAmount: 0, completedCount: 0, upcomingCount: 0, orders: [] });
+      map.set(month, { earnings: 0, pendingAmount: 0, totalExpenses: 0, completedCount: 0, upcomingCount: 0, orders: [] });
     }
     const entry = map.get(month)!;
     entry.orders.push(o);
@@ -285,6 +287,11 @@ export async function getMonthlyEarnings(): Promise<MonthEarnings[]> {
     const total = Number(o.total_price || 0);
     const travel = Number(o.travel_expense || 0);
     const other = Number(o.other_expenses || 0);
+
+    // Accumulate expenses for this month (all statuses except cancelled)
+    if (o.status !== "cancelled") {
+      entry.totalExpenses += travel + other;
+    }
 
     if (o.status === "completed") {
       entry.earnings += total - travel - other;
@@ -311,7 +318,7 @@ export async function getMonthlyEarnings(): Promise<MonthEarnings[]> {
   let y = minY, m = minM;
   while (y < maxY || (y === maxY && m <= maxM)) {
     const key = `${y}-${String(m).padStart(2, "0")}`;
-    const entry = map.get(key) ?? { earnings: 0, pendingAmount: 0, completedCount: 0, upcomingCount: 0, orders: [] };
+    const entry = map.get(key) ?? { earnings: 0, pendingAmount: 0, totalExpenses: 0, completedCount: 0, upcomingCount: 0, orders: [] };
 
     const date = new Date(y, m - 1, 1);
     const label = date.toLocaleDateString("en-IN", { month: "long", year: "numeric" });
