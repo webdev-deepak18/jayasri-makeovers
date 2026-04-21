@@ -39,7 +39,7 @@ export default async function DashboardPage({
           <p className="text-xs font-bold uppercase tracking-widest text-brand-secondary mb-1">Total Earnings</p>
           <p className="text-5xl font-poppins font-bold leading-none">₹{stats.totalEarned.toLocaleString()}</p>
           {stats.pendingToCollect > 0 && (
-            <p className="text-[11px] text-white/40 mt-1">
+            <p className="text-xs text-white/40 mt-1">
               ₹{(stats.totalEarned + stats.pendingToCollect).toLocaleString()} when all pending paid
             </p>
           )}
@@ -47,9 +47,9 @@ export default async function DashboardPage({
             Completed in full + advances on upcoming orders
           </p>
           {stats.pendingToCollect > 0 && (
-            <div className="mt-3 inline-flex items-center gap-1.5 bg-amber-400/20 border border-amber-400/30 rounded-full px-3 py-1">
+            <div className="mt-3 inline-flex items-center gap-1.5 bg-amber-400/20 border border-amber-400/30 rounded-full px-3.5 py-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
-              <p className="text-[11px] font-bold text-amber-200">
+              <p className="text-xs font-bold text-amber-200">
                 ₹{stats.pendingToCollect.toLocaleString()} still to collect
               </p>
             </div>

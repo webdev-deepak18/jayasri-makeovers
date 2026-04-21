@@ -131,7 +131,7 @@ export default async function EarningsPage({
           ₹{selected.earnings.toLocaleString("en-IN")}
         </p>
         {selected.pendingAmount > 0 && (
-          <p className="text-[11px] text-white/40 mt-1">
+          <p className="text-xs text-white/40 mt-1">
             ₹{(selected.earnings + selected.pendingAmount).toLocaleString("en-IN")} when fully paid
           </p>
         )}
@@ -152,9 +152,9 @@ export default async function EarningsPage({
         </div>
         {/* Pending pill */}
         {selected.pendingAmount > 0 && (
-          <div className="mt-3 inline-flex items-center gap-1.5 bg-amber-400/20 border border-amber-400/30 rounded-full px-3 py-1">
+          <div className="mt-3 inline-flex items-center gap-1.5 bg-amber-400/20 border border-amber-400/30 rounded-full px-3.5 py-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
-            <p className="text-[11px] font-bold text-amber-200">
+            <p className="text-xs font-bold text-amber-200">
               ₹{selected.pendingAmount.toLocaleString("en-IN")} still to collect
             </p>
           </div>
