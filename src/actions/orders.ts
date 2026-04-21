@@ -72,9 +72,10 @@ export async function getDashboardStats(): Promise<DashboardStats> {
         }
       } else if (o.status === 'upcoming') {
         // Upcoming: only the advance is earned so far
-        // Pending = full amount left to collect from client (including any expenses passed to them)
+        // Pending = NET service price still to collect (total minus expenses minus advance)
+        const netServicePrice = total - travel - other;
         totalEarned += advance;
-        pendingToCollect += Math.max(0, total - advance);
+        pendingToCollect += Math.max(0, netServicePrice - advance);
 
         if (lastDate >= todayStr) {
           openOrdersCount++;
@@ -289,8 +290,10 @@ export async function getMonthlyEarnings(): Promise<MonthEarnings[]> {
       entry.earnings += total - travel - other;
       entry.completedCount++;
     } else if (o.status === "upcoming") {
+      // Net pending = net service price (total minus expenses) minus already-paid advance
+      const netServicePrice = total - travel - other;
       entry.earnings += advance;
-      entry.pendingAmount += Math.max(0, total - advance);
+      entry.pendingAmount += Math.max(0, netServicePrice - advance);
       entry.upcomingCount++;
     }
     // cancelled → no earnings

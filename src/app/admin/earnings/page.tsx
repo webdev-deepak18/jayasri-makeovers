@@ -343,7 +343,8 @@ export default async function EarningsPage({
                         {isCompleted ? "earned" : "advance"}
                       </p>
                       {!isCompleted && (() => {
-                        const pending = Number(order.total_price) - Number(order.advance_amount || 0);
+                        const netServicePrice = Number(order.total_price) - Number(order.travel_expense || 0) - Number(order.other_expenses || 0);
+                        const pending = Math.max(0, netServicePrice - Number(order.advance_amount || 0));
                         return pending > 0 ? (
                           <p className="text-[9px] font-semibold text-amber-500">
                             ₹{pending.toLocaleString("en-IN")} due
