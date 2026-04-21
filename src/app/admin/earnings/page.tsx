@@ -1,4 +1,4 @@
-import { getMonthlyEarnings } from "@/actions/orders";
+import { getMonthlyEarnings, type MonthEarnings } from "@/actions/orders";
 import Link from "next/link";
 import { format } from "date-fns";
 import { getMakeupIcon } from "@/lib/makeup-utils";
@@ -18,13 +18,14 @@ export default async function EarningsPage({
   const selectedMonth = params.month || currentMonth;
 
   // Ensure the selected month exists in our list (could be a future/past month not in DB yet)
-  const selected = months.find((m) => m.month === selectedMonth) ?? {
+  const selected: MonthEarnings = months.find((m) => m.month === selectedMonth) ?? {
     month: selectedMonth,
     label: new Date(selectedMonth + "-01").toLocaleDateString("en-IN", {
       month: "long",
       year: "numeric",
     }),
     earnings: 0,
+    pendingAmount: 0,
     completedCount: 0,
     upcomingCount: 0,
     orders: [],
@@ -65,7 +66,7 @@ export default async function EarningsPage({
   const totalAllTime = months.reduce((sum, m) => sum + m.earnings, 0);
   const bestMonth = months.reduce(
     (best, m) => (m.earnings > best.earnings ? m : best),
-    { month: "", label: "—", earnings: 0, completedCount: 0, upcomingCount: 0, orders: [] }
+    { month: "", label: "—", earnings: 0, pendingAmount: 0, completedCount: 0, upcomingCount: 0, orders: [] } as MonthEarnings
   );
 
   // Sort selected orders by date
