@@ -235,6 +235,91 @@ export async function quickCompleteOrder(id: string, balanceReceived: number) {
 }
 
 
+export interface MonthEarnings {
+  /** e.g. "2026-04" */
+  month: string;
+  /** Human-readable label e.g. "April 2026" */
+  label: string;
+  earnings: number;
+  completedCount: number;
+  upcomingCount: number;
+  orders: any[];
+}
+
+/**
+ * Returns one entry per calendar month from the earliest order date
+ * to the latest order date (or current month, whichever is later).
+ * Months with zero earnings are still included.
+ */
+export async function getMonthlyEarnings(): Promise<MonthEarnings[]> {
+  const { data: allOrders } = await supabase.from("orders").select("*");
+  if (!allOrders || allOrders.length === 0) return [];
+
+  // Build a map: "YYYY-MM" -> accumulated data
+  const map = new Map<string, { earnings: number; completedCount: number; upcomingCount: number; orders: any[] }>();
+
+  // Determine range boundaries
+  let minMonth = "9999-99";
+  let maxMonth = "0000-00";
+  const currentMonth = new Date().toISOString().slice(0, 7); // "YYYY-MM"
+
+  allOrders.forEach((o) => {
+    const dates = o.date ? o.date.split(",").map((d: string) => d.trim()).sort() : [];
+    const firstDate = dates[0] || "";
+    if (!firstDate) return;
+
+    const month = firstDate.slice(0, 7); // "YYYY-MM"
+    if (month < minMonth) minMonth = month;
+    if (month > maxMonth) maxMonth = month;
+
+    if (!map.has(month)) {
+      map.set(month, { earnings: 0, completedCount: 0, upcomingCount: 0, orders: [] });
+    }
+    const entry = map.get(month)!;
+    entry.orders.push(o);
+
+    const advance = Number(o.advance_amount || 0);
+    const total = Number(o.total_price || 0);
+    const travel = Number(o.travel_expense || 0);
+    const other = Number(o.other_expenses || 0);
+
+    if (o.status === "completed") {
+      entry.earnings += total - travel - other;
+      entry.completedCount++;
+    } else if (o.status === "upcoming") {
+      entry.earnings += advance;
+      entry.upcomingCount++;
+    }
+    // cancelled → no earnings
+  });
+
+  // Make sure current month is always in range (even if no orders yet)
+  if (currentMonth > maxMonth) maxMonth = currentMonth;
+  if (minMonth === "9999-99") minMonth = currentMonth;
+
+  // Fill all months from minMonth to maxMonth
+  const result: MonthEarnings[] = [];
+  const [minY, minM] = minMonth.split("-").map(Number);
+  const [maxY, maxM] = maxMonth.split("-").map(Number);
+
+  let y = minY, m = minM;
+  while (y < maxY || (y === maxY && m <= maxM)) {
+    const key = `${y}-${String(m).padStart(2, "0")}`;
+    const entry = map.get(key) ?? { earnings: 0, completedCount: 0, upcomingCount: 0, orders: [] };
+
+    const date = new Date(y, m - 1, 1);
+    const label = date.toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+
+    result.push({ month: key, label, ...entry });
+
+    m++;
+    if (m > 12) { m = 1; y++; }
+  }
+
+  // Most recent month first
+  return result.reverse();
+}
+
 export async function getPublicBookedDates() {
   const { data } = await supabase
     .from("orders")

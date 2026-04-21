@@ -17,7 +17,7 @@ const images = [
   // Scattering hairstyle photos in between
   { src: "/images/portfolio/hair-01.webp", category: "hair" },
   { src: "/images/portfolio/hair-12.webp", category: "hair" },
-  { src: "/images/portfolio/reception-01.webp", category: "reception" },
+  // { src: "/images/portfolio/reception-01.webp", category: "reception" },
   { src: "/images/portfolio/simple-02.webp", category: "simple" },
   { src: "/images/portfolio/hair-02.webp", category: "hair" },
   

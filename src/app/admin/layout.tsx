@@ -6,13 +6,15 @@ import {
   HomeIcon, 
   ClipboardDocumentListIcon, 
   UsersIcon, 
-  CalendarIcon 
+  CalendarIcon,
+  ChartBarIcon
 } from "@heroicons/react/24/outline";
 import { 
   HomeIcon as HomeIconSolid, 
   ClipboardDocumentListIcon as ClipboardSolid, 
   UsersIcon as UsersSolid, 
-  CalendarIcon as CalendarSolid 
+  CalendarIcon as CalendarSolid,
+  ChartBarIcon as ChartBarSolid
 } from "@heroicons/react/24/solid";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -24,9 +26,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   const tabs = [
-    { name: "Dashboard", href: "/admin/dashboard", icon: HomeIcon, iconActive: HomeIconSolid },
+    { name: "Home", href: "/admin/dashboard", icon: HomeIcon, iconActive: HomeIconSolid },
     { name: "Calendar", href: "/admin/calendar", icon: CalendarIcon, iconActive: CalendarSolid },
     { name: "Orders", href: "/admin/orders", icon: ClipboardDocumentListIcon, iconActive: ClipboardSolid },
+    { name: "Earnings", href: "/admin/earnings", icon: ChartBarIcon, iconActive: ChartBarSolid },
     { name: "Clients", href: "/admin/clients", icon: UsersIcon, iconActive: UsersSolid },
   ];
 
@@ -40,7 +43,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Bottom Tab Navigation Bar (Mobile) */}
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-brand-secondary/20 safe-area-bottom z-50 md:sticky md:bottom-auto">
-          <div className="max-w-md mx-auto grid grid-cols-4 h-16">
+          <div className="max-w-md mx-auto grid grid-cols-5 h-16">
             {tabs.map((tab) => {
               const isActive = pathname === tab.href || pathname.startsWith(tab.href + "/");
               // Exception: Don't highlight "Orders" if we are on "New Order"
