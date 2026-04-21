@@ -87,9 +87,9 @@ export default async function OrdersPage({
                         </>
                       ) : (
                         <>
-                          <p className="text-[9px] font-semibold text-amber-400 mb-0.5">pending</p>
-                          <p className="text-sm font-bold text-amber-500 leading-none">₹{netPending.toLocaleString()}</p>
-                          <p className="text-[9px] text-neutral-400 mt-1">₹{advance.toLocaleString()} adv</p>
+                          <p className="text-[9px] font-bold text-amber-500 mb-0.5 uppercase tracking-wide">pending</p>
+                          <p className="text-base font-black text-amber-600 leading-none">₹{netPending.toLocaleString()}</p>
+                          <p className="text-[9px] font-medium text-neutral-400 mt-1">₹{advance.toLocaleString()} adv</p>
                         </>
                       )}
                     </div>
