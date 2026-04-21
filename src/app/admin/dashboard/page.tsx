@@ -38,9 +38,22 @@ export default async function DashboardPage({
           <div className="absolute -bottom-6 -right-2 w-20 h-20 bg-white/5 rounded-full" />
           <p className="text-xs font-bold uppercase tracking-widest text-brand-secondary mb-1">Total Earnings</p>
           <p className="text-5xl font-poppins font-bold leading-none">₹{stats.totalEarned.toLocaleString()}</p>
+          {stats.pendingToCollect > 0 && (
+            <p className="text-[11px] text-white/40 mt-1">
+              ₹{(stats.totalEarned + stats.pendingToCollect).toLocaleString()} when all pending paid
+            </p>
+          )}
           <p className="text-[11px] text-white/50 mt-2">
             Completed in full + advances on upcoming orders
           </p>
+          {stats.pendingToCollect > 0 && (
+            <div className="mt-3 inline-flex items-center gap-1.5 bg-amber-400/20 border border-amber-400/30 rounded-full px-3 py-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
+              <p className="text-[11px] font-bold text-amber-200">
+                ₹{stats.pendingToCollect.toLocaleString()} still to collect
+              </p>
+            </div>
+          )}
         </div>
 
         {/* 3-column stat row */}
@@ -59,16 +72,6 @@ export default async function DashboardPage({
           </div>
         </div>
 
-        {/* Pending to collect — only show if there's something pending */}
-        {stats.pendingToCollect > 0 && (
-          <div className="flex items-center justify-between bg-amber-50 border border-amber-200 px-4 py-3 rounded-xl">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-amber-700">Pending Collection</p>
-              <p className="text-[10px] text-amber-500 mt-0.5">Balance due on upcoming bookings</p>
-            </div>
-            <p className="text-xl font-poppins font-bold text-amber-700">₹{stats.pendingToCollect.toLocaleString()}</p>
-          </div>
-        )}
 
         {/* Travel expenses — only show if any */}
         {stats.totalTravelExpense > 0 && (
