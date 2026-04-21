@@ -129,7 +129,12 @@ export default async function EarningsPage({
         <p className="text-5xl font-poppins font-bold leading-none">
           ₹{selected.earnings.toLocaleString("en-IN")}
         </p>
-        <div className="flex gap-4 mt-3">
+        {selected.pendingAmount > 0 && (
+          <p className="text-[11px] text-white/40 mt-1">
+            ₹{(selected.earnings + selected.pendingAmount).toLocaleString("en-IN")} when fully paid
+          </p>
+        )}
+        <div className="flex flex-wrap gap-3 mt-3">
           {selected.completedCount > 0 && (
             <p className="text-[11px] text-white/60">
               ✅ {selected.completedCount} completed
@@ -144,6 +149,15 @@ export default async function EarningsPage({
             <p className="text-[11px] text-white/50">No bookings this month</p>
           )}
         </div>
+        {/* Pending pill */}
+        {selected.pendingAmount > 0 && (
+          <div className="mt-3 inline-flex items-center gap-1.5 bg-amber-400/20 border border-amber-400/30 rounded-full px-3 py-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
+            <p className="text-[11px] font-bold text-amber-200">
+              ₹{selected.pendingAmount.toLocaleString("en-IN")} still to collect
+            </p>
+          </div>
+        )}
       </div>
 
       {/* All-Time Summary */}
@@ -327,6 +341,14 @@ export default async function EarningsPage({
                       <p className={`text-[9px] font-semibold ${isCompleted ? "text-green-400" : "text-brand-secondary"}`}>
                         {isCompleted ? "earned" : "advance"}
                       </p>
+                      {!isCompleted && (() => {
+                        const pending = Number(order.total_price) - Number(order.advance_amount || 0);
+                        return pending > 0 ? (
+                          <p className="text-[9px] font-semibold text-amber-500">
+                            ₹{pending.toLocaleString("en-IN")} due
+                          </p>
+                        ) : null;
+                      })()}
                     </div>
 
                     <svg className="w-4 h-4 text-neutral-300 ml-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

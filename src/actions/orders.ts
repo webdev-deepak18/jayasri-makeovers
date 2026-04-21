@@ -241,6 +241,8 @@ export interface MonthEarnings {
   /** Human-readable label e.g. "April 2026" */
   label: string;
   earnings: number;
+  /** Balance still to collect on upcoming orders this month */
+  pendingAmount: number;
   completedCount: number;
   upcomingCount: number;
   orders: any[];
@@ -256,7 +258,7 @@ export async function getMonthlyEarnings(): Promise<MonthEarnings[]> {
   if (!allOrders || allOrders.length === 0) return [];
 
   // Build a map: "YYYY-MM" -> accumulated data
-  const map = new Map<string, { earnings: number; completedCount: number; upcomingCount: number; orders: any[] }>();
+  const map = new Map<string, { earnings: number; pendingAmount: number; completedCount: number; upcomingCount: number; orders: any[] }>();
 
   // Determine range boundaries
   let minMonth = "9999-99";
@@ -273,7 +275,7 @@ export async function getMonthlyEarnings(): Promise<MonthEarnings[]> {
     if (month > maxMonth) maxMonth = month;
 
     if (!map.has(month)) {
-      map.set(month, { earnings: 0, completedCount: 0, upcomingCount: 0, orders: [] });
+      map.set(month, { earnings: 0, pendingAmount: 0, completedCount: 0, upcomingCount: 0, orders: [] });
     }
     const entry = map.get(month)!;
     entry.orders.push(o);
@@ -288,6 +290,7 @@ export async function getMonthlyEarnings(): Promise<MonthEarnings[]> {
       entry.completedCount++;
     } else if (o.status === "upcoming") {
       entry.earnings += advance;
+      entry.pendingAmount += Math.max(0, total - advance);
       entry.upcomingCount++;
     }
     // cancelled → no earnings
@@ -305,7 +308,7 @@ export async function getMonthlyEarnings(): Promise<MonthEarnings[]> {
   let y = minY, m = minM;
   while (y < maxY || (y === maxY && m <= maxM)) {
     const key = `${y}-${String(m).padStart(2, "0")}`;
-    const entry = map.get(key) ?? { earnings: 0, completedCount: 0, upcomingCount: 0, orders: [] };
+    const entry = map.get(key) ?? { earnings: 0, pendingAmount: 0, completedCount: 0, upcomingCount: 0, orders: [] };
 
     const date = new Date(y, m - 1, 1);
     const label = date.toLocaleDateString("en-IN", { month: "long", year: "numeric" });
