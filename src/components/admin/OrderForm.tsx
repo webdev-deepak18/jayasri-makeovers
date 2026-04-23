@@ -70,7 +70,7 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
   const minDate = tomorrow.toISOString().split("T")[0];
 
   // Makeup type state
-  const predefinedTypes = ["Simple Makeover", "Bridal Makeover", "Saree Draping + Hairstyle"];
+  const predefinedTypes = ["Simple Makeover", "Bridal Makeover", "Saree Draping and Hairstyle"];
   const initialIsOther = initialData?.makeup_type ? !predefinedTypes.includes(initialData.makeup_type) : false;
 
   const [makeupType, setMakeupType] = useState<string>(
@@ -292,7 +292,7 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
               {[
                 { id: "Simple Makeover", desc: "Makeup + Hair + Saree Draping" },
                 { id: "Bridal Makeover", desc: "HD Makeup + Hair + Saree Draping" },
-                { id: "Saree Draping + Hairstyle", desc: "Saree Draping + Hairstyle only" },
+                { id: "Saree Draping and Hairstyle", desc: "Saree Draping + Hairstyle only" },
                 { id: "Other", desc: "Something else — please specify" }
               ].map((opt) => (
                 <button
@@ -353,7 +353,7 @@ export default function OrderForm({ initialData, orderId }: { initialData?: any;
                   <input
                     type="date"
                     value={d}
-                    min={minDate}
+                    min={isEditing ? undefined : minDate}
                     onChange={(e) => handleDateChange(i, e.target.value)}
                     className="flex-1 px-3 py-2 border border-neutral-200 rounded-lg focus:ring-1 focus:ring-brand-secondary outline-none font-poppins"
                   />

@@ -21,7 +21,7 @@ export default function Pricing() {
           </div>
           <div className="flex justify-between items-start mb-2">
             <h4 className="font-playfair text-xl font-bold text-neutral-800 pr-4">{t("pricing.simple")}</h4>
-            <span className="font-poppins font-bold text-brand-primary text-xl whitespace-nowrap">₹3000</span>
+            <span className="font-poppins font-bold text-brand-primary text-xl whitespace-nowrap">₹3500</span>
           </div>
           <p className="text-sm text-neutral-500 leading-relaxed">{t("pricing.simpleInclude")}</p>
         </div>
@@ -30,7 +30,7 @@ export default function Pricing() {
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100 transition-transform hover:-translate-y-1">
           <div className="flex justify-between items-start mb-2">
             <h4 className="font-playfair text-xl font-bold text-neutral-800">{t("pricing.hdBridal")}</h4>
-            <span className="font-poppins font-bold text-brand-primary text-xl whitespace-nowrap">₹5000</span>
+            <span className="font-poppins font-bold text-brand-primary text-xl whitespace-nowrap">₹5500</span>
           </div>
           <p className="text-sm text-neutral-500 leading-relaxed">{t("pricing.hdBridalInclude")}</p>
         </div>
@@ -39,7 +39,7 @@ export default function Pricing() {
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100 transition-transform hover:-translate-y-1">
           <div className="flex justify-between items-start mb-2">
             <h4 className="font-playfair text-xl font-bold text-neutral-800">{t("pricing.engagement")}</h4>
-            <span className="font-poppins font-bold text-brand-primary text-xl whitespace-nowrap">₹4000</span>
+            <span className="font-poppins font-bold text-brand-primary text-xl whitespace-nowrap">₹4500</span>
           </div>
           <p className="text-sm text-neutral-500 leading-relaxed">{t("pricing.engagementInclude")}</p>
         </div>
@@ -48,7 +48,7 @@ export default function Pricing() {
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100 transition-transform hover:-translate-y-1">
           <div className="flex justify-between items-start mb-2">
             <h4 className="font-playfair text-xl font-bold text-neutral-800">{t("pricing.sareeHair")}</h4>
-            <span className="font-poppins font-bold text-brand-primary text-xl whitespace-nowrap">₹1000</span>
+            <span className="font-poppins font-bold text-brand-primary text-xl whitespace-nowrap">₹1500</span>
           </div>
           <p className="text-sm text-neutral-500 leading-relaxed">{t("pricing.sareeHairInclude")}</p>
         </div>
