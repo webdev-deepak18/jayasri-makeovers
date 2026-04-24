@@ -11,6 +11,7 @@ const images = [
   { src: "/images/portfolio/bridal-01.webp", category: "bridal" },
   { src: "/images/portfolio/bridal-03.webp", category: "bridal" },
   { src: "/images/portfolio/hd-01.webp", category: "hd" },
+  { src: "/images/portfolio/hd-02.webp", category: "hd" },
   { src: "/images/portfolio/engagement-01.webp", category: "engagement" },
   { src: "/images/portfolio/simple-01.webp", category: "simple" },
   
@@ -20,6 +21,8 @@ const images = [
   // { src: "/images/portfolio/reception-01.webp", category: "reception" },
   { src: "/images/portfolio/simple-02.webp", category: "simple" },
   { src: "/images/portfolio/hair-02.webp", category: "hair" },
+  { src: "/images/portfolio/hair-13.webp", category: "hair" },
+  { src: "/images/portfolio/hair-14.webp", category: "hair" },
   
   { src: "/images/portfolio/bridal-02.webp", category: "bridal" },
   { src: "/images/portfolio/babyshower-01.webp", category: "babyShower" },
@@ -28,6 +31,8 @@ const images = [
   { src: "/images/portfolio/simple-03.webp", category: "simple" },
   { src: "/images/portfolio/hair-05.webp", category: "hair" },
   { src: "/images/portfolio/simple-04.webp", category: "simple" },
+  { src: "/images/portfolio/simple-07.webp", category: "simple" },
+  { src: "/images/portfolio/simple-06.webp", category: "simple" },
   
   { src: "/images/portfolio/babyshower-02.webp", category: "babyShower" },
   { src: "/images/portfolio/hair-07.webp", category: "hair" },
