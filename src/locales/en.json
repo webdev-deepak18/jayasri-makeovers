@@ -25,13 +25,10 @@
   
   "portfolio.title": "My Work",
   "portfolio.all": "All",
-  "portfolio.bridal": "Bridal",
-  "portfolio.hair": "Hairstyles",
-  "portfolio.hd": "HD Makeup",
-  "portfolio.engagement": "Engagement",
   "portfolio.simple": "Simple",
-  "portfolio.babyShower": "Baby Shower",
-  "portfolio.reception": "Reception",
+  "portfolio.semi-hd": "Semi-HD Makeup",
+  "portfolio.hd-bridal": "HD Bridal Makeup",
+  "portfolio.hairstyle": "Hairstyles",
   
   "calendar.title": "Availability Calendar",
   "calendar.available": "Available",

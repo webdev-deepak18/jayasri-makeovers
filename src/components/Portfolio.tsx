@@ -4,45 +4,50 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 
-type Category = "all" | "bridal" | "hair" | "hd" | "engagement" | "simple" | "babyShower" | "reception";
+type Category = "all" | "simple" | "semi-hd" | "hd-bridal" | "hairstyle";
 
-const images = [
+type PortfolioImage = {
+  src: string;
+  category: Category | Category[];
+};
+
+const images: PortfolioImage[] = [
   // Initial few photos are makeup as requested
-  { src: "/images/portfolio/bridal-01.webp", category: "bridal" },
-  { src: "/images/portfolio/bridal-03.webp", category: "bridal" },
-  { src: "/images/portfolio/hd-01.webp", category: "hd" },
-  { src: "/images/portfolio/hd-02.webp", category: "hd" },
-  { src: "/images/portfolio/engagement-01.webp", category: "engagement" },
+  { src: "/images/portfolio/bridal-01.webp", category: "hd-bridal" },
+  { src: "/images/portfolio/bridal-03.webp", category: "hd-bridal" },
+  { src: "/images/portfolio/hd-01.webp", category: "hd-bridal" },
+  { src: "/images/portfolio/hd-02.webp", category: "hd-bridal" },
+  { src: "/images/portfolio/engagement-01.webp", category: "semi-hd" },
   { src: "/images/portfolio/simple-01.webp", category: "simple" },
   
   // Scattering hairstyle photos in between
-  { src: "/images/portfolio/hair-01.webp", category: "hair" },
-  { src: "/images/portfolio/hair-12.webp", category: "hair" },
-  // { src: "/images/portfolio/reception-01.webp", category: "reception" },
+  { src: "/images/portfolio/hair-01.webp", category: "hairstyle" },
+  { src: "/images/portfolio/hair-12.webp", category: "hairstyle" },
+  // { src: "/images/portfolio/reception-01.webp", category: "semi-hd" },
   { src: "/images/portfolio/simple-02.webp", category: "simple" },
-  { src: "/images/portfolio/hair-02.webp", category: "hair" },
-  { src: "/images/portfolio/hair-13.webp", category: "hair" },
-  { src: "/images/portfolio/hair-14.webp", category: "hair" },
+  { src: "/images/portfolio/hair-02.webp", category: "hairstyle" },
+  { src: "/images/portfolio/hair-13.webp", category: "hairstyle" },
+  { src: "/images/portfolio/hair-14.webp", category: "hairstyle" },
   
-  { src: "/images/portfolio/bridal-02.webp", category: "bridal" },
-  { src: "/images/portfolio/babyshower-01.webp", category: "babyShower" },
-  { src: "/images/portfolio/hair-03.webp", category: "hair" },
+  { src: "/images/portfolio/bridal-02.webp", category: "hd-bridal" },
+  { src: "/images/portfolio/babyshower-01.webp", category: "semi-hd" },
+  { src: "/images/portfolio/hair-03.webp", category: "hairstyle" },
   
   { src: "/images/portfolio/simple-03.webp", category: "simple" },
-  { src: "/images/portfolio/hair-05.webp", category: "hair" },
+  { src: "/images/portfolio/hair-05.webp", category: "hairstyle" },
   { src: "/images/portfolio/simple-04.webp", category: "simple" },
   { src: "/images/portfolio/simple-07.webp", category: "simple" },
   { src: "/images/portfolio/simple-06.webp", category: "simple" },
   
-  { src: "/images/portfolio/babyshower-02.webp", category: "babyShower" },
-  { src: "/images/portfolio/hair-07.webp", category: "hair" },
+  { src: "/images/portfolio/babyshower-02.webp", category: "semi-hd" },
+  { src: "/images/portfolio/hair-07.webp", category: "hairstyle" },
   
   { src: "/images/portfolio/simple-05.webp", category: "simple" },
-  { src: "/images/portfolio/hair-08.webp", category: "hair" },
+  { src: "/images/portfolio/hair-08.webp", category: "hairstyle" },
   
-  { src: "/images/portfolio/hair-09.webp", category: "hair" },
-  { src: "/images/portfolio/hair-10.webp", category: "hair" },
-  { src: "/images/portfolio/hair-11.webp", category: "hair" },
+  { src: "/images/portfolio/hair-09.webp", category: "hairstyle" },
+  { src: "/images/portfolio/hair-10.webp", category: "hairstyle" },
+  { src: "/images/portfolio/hair-11.webp", category: "hairstyle" },
 ];
 
 export default function Portfolio() {
@@ -62,8 +67,12 @@ export default function Portfolio() {
       return arr;
     };
 
-    const hairImages = images.filter((img) => img.category === "hair");
-    const otherImages = images.filter((img) => img.category !== "hair");
+    const hairImages = images.filter((img) => 
+      Array.isArray(img.category) ? img.category.includes("hairstyle") : img.category === "hairstyle"
+    );
+    const otherImages = images.filter((img) => 
+      Array.isArray(img.category) ? !img.category.includes("hairstyle") : img.category !== "hairstyle"
+    );
     
     const shuffledOthers = shuffleArray(otherImages);
     const shuffledHair = shuffleArray(hairImages);
@@ -83,16 +92,15 @@ export default function Portfolio() {
 
   const categories: { id: Category; labelKey: string }[] = [
     { id: "all", labelKey: "portfolio.all" },
-    { id: "bridal", labelKey: "portfolio.bridal" },
-    { id: "hair", labelKey: "portfolio.hair" },
-    { id: "hd", labelKey: "portfolio.hd" },
-    { id: "engagement", labelKey: "portfolio.engagement" },
     { id: "simple", labelKey: "portfolio.simple" },
-    { id: "babyShower", labelKey: "portfolio.babyShower" },
-    { id: "reception", labelKey: "portfolio.reception" },
+    { id: "semi-hd", labelKey: "portfolio.semi-hd" },
+    { id: "hd-bridal", labelKey: "portfolio.hd-bridal" },
+    { id: "hairstyle", labelKey: "portfolio.hairstyle" },
   ];
 
-  const filteredImages = activeTab === "all" ? shuffledImages : shuffledImages.filter(img => img.category === activeTab);
+  const filteredImages = activeTab === "all" ? shuffledImages : shuffledImages.filter(img => 
+    Array.isArray(img.category) ? img.category.includes(activeTab) : img.category === activeTab
+  );
 
   const openLightbox = (index: number) => setLightboxIndex(index);
   const closeLightbox = () => setLightboxIndex(null);
@@ -170,7 +178,7 @@ export default function Portfolio() {
           >
             <Image
               src={img.src}
-              alt={`Jayasri Makeovers - Professional ${img.category} makeup and hairstyling in Bangalore`}
+              alt={`Jayasri Makeovers - Professional ${Array.isArray(img.category) ? img.category.join(", ") : img.category} makeup and hairstyling in Bangalore`}
               width={400}
               height={600}
               className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105 protect-image"
@@ -253,7 +261,7 @@ export default function Portfolio() {
             >
               <Image
                 src={filteredImages[lightboxIndex].src}
-                alt={`Jayasri Makeovers ${filteredImages[lightboxIndex].category} full size`}
+                alt={`Jayasri Makeovers ${Array.isArray(filteredImages[lightboxIndex].category) ? filteredImages[lightboxIndex].category.join(", ") : filteredImages[lightboxIndex].category} full size`}
                 fill
                 className="object-contain pointer-events-none select-none protect-image"
                 priority

@@ -25,13 +25,10 @@
   
   "portfolio.title": "ನನ್ನ ಕೆಲಸಗಳು",
   "portfolio.all": "ಎಲ್ಲಾ",
-  "portfolio.bridal": "ಮದುವೆ ಕಲೆ (Bridal)",
-  "portfolio.hair": "ಕೇಶವಿನ್ಯಾಸ",
-  "portfolio.hd": "ಎಚ್ಡಿ ಮೇಕಪ್",
-  "portfolio.engagement": "ಎಂಗೇಜ್ಮೆಂಟ್",
   "portfolio.simple": "ಸಿಂಪಲ್",
-  "portfolio.babyShower": "ಸೀಮಂತ",
-  "portfolio.reception": "ರಿಸೆಪ್ಷನ್",
+  "portfolio.semi-hd": "ಸೆಮಿ-ಎಚ್‌ಡಿ ಮೇಕಪ್",
+  "portfolio.hd-bridal": "ಎಚ್‌ಡಿ ಬ್ರೈಡಲ್ ಮೇಕಪ್",
+  "portfolio.hairstyle": "ಕೇಶವಿನ್ಯಾಸ",
   
   "calendar.title": "ಲಭ್ಯತೆ (ಕ್ಯಾಲೆಂಡರ್)",
   "calendar.available": "ಲಭ್ಯವಿದೆ",
