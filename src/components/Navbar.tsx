@@ -99,7 +99,7 @@ export default function Navbar() {
           }`}
         >
           <a 
-            href="https://wa.me/918867052945"
+            href="https://wa.me/918867052945?text=Hi%20Jayasri,%20I%20would%20like%20to%20inquire%20about%20your%20makeup%20services!"
             target="_blank" rel="noopener noreferrer"
             className="w-full bg-brand-primary text-white text-center py-4 rounded-2xl font-poppins font-bold text-lg tracking-wide shadow-xl shadow-brand-primary/20 flex items-center justify-center gap-2 active:scale-95 transition-transform"
             onClick={() => setIsMenuOpen(false)}

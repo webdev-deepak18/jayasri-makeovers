@@ -18,6 +18,7 @@ const images: PortfolioImage[] = [
   { src: "/images/portfolio/hd-01.webp", category: "hd-bridal" },
   { src: "/images/portfolio/hd-02.webp", category: "hd-bridal" },
   { src: "/images/portfolio/engagement-01.webp", category: "semi-hd" },
+  { src: "/images/portfolio/babyshower-03", category: "semi-hd" },
   { src: "/images/portfolio/simple-01.webp", category: "simple" },
   
   // Scattering hairstyle photos in between
@@ -28,6 +29,10 @@ const images: PortfolioImage[] = [
   { src: "/images/portfolio/hair-02.webp", category: "hairstyle" },
   { src: "/images/portfolio/hair-13.webp", category: "hairstyle" },
   { src: "/images/portfolio/hair-14.webp", category: "hairstyle" },
+  { src: "/images/portfolio/hair-15.webp", category: "hairstyle" },
+  { src: "/images/portfolio/hair-16.webp", category: "hairstyle" },
+  { src: "/images/portfolio/hair-17.webp", category: "hairstyle" },
+  { src: "/images/portfolio/hair-18.webp", category: "hairstyle" },
   
   { src: "/images/portfolio/bridal-02.webp", category: "hd-bridal" },
   { src: "/images/portfolio/babyshower-01.webp", category: "semi-hd" },
@@ -38,11 +43,13 @@ const images: PortfolioImage[] = [
   { src: "/images/portfolio/simple-04.webp", category: "simple" },
   { src: "/images/portfolio/simple-07.webp", category: "simple" },
   { src: "/images/portfolio/simple-06.webp", category: "simple" },
+  { src: "/images/portfolio/semi-hd-01", category: "semi-hd" },
   
   { src: "/images/portfolio/babyshower-02.webp", category: "semi-hd" },
   { src: "/images/portfolio/hair-07.webp", category: "hairstyle" },
   
   { src: "/images/portfolio/simple-05.webp", category: "simple" },
+  { src: "/images/portfolio/simple-06.webp", category: "simple" },
   { src: "/images/portfolio/hair-08.webp", category: "hairstyle" },
   
   { src: "/images/portfolio/hair-09.webp", category: "hairstyle" },
