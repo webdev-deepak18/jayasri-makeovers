@@ -49,12 +49,28 @@ const images: PortfolioImage[] = [
   { src: "/images/portfolio/hair-07.webp", category: "hairstyle" },
   
   { src: "/images/portfolio/simple-05.webp", category: "simple" },
-  { src: "/images/portfolio/simple-06.webp", category: "simple" },
   { src: "/images/portfolio/hair-08.webp", category: "hairstyle" },
   
   { src: "/images/portfolio/hair-09.webp", category: "hairstyle" },
   { src: "/images/portfolio/hair-10.webp", category: "hairstyle" },
   { src: "/images/portfolio/hair-11.webp", category: "hairstyle" },
+  
+  // Newly added photos
+  { src: "/images/portfolio/simple-08.webp", category: "simple" },
+  { src: "/images/portfolio/simple-09.webp", category: "simple" },
+  { src: "/images/portfolio/simple-10.webp", category: "simple" },
+  { src: "/images/portfolio/simple-11.webp", category: "simple" },
+  { src: "/images/portfolio/simple-12.webp", category: "simple" },
+  
+  { src: "/images/portfolio/bridal-04.webp", category: "hd-bridal" },
+  { src: "/images/portfolio/bridal-05.webp", category: "hd-bridal" },
+  { src: "/images/portfolio/bridal-06.webp", category: "hd-bridal" },
+  { src: "/images/portfolio/bridal-07.webp", category: "hd-bridal" },
+  { src: "/images/portfolio/bridal-08.webp", category: "hd-bridal" },
+  
+  { src: "/images/portfolio/hair-19.webp", category: "hairstyle" },
+  { src: "/images/portfolio/hair-20.webp", category: "hairstyle" },
+  { src: "/images/portfolio/hair-21.webp", category: "hairstyle" },
 ];
 
 export default function Portfolio() {
