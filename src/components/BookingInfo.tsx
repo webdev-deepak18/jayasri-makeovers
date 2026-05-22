@@ -67,7 +67,7 @@ export default function BookingInfo() {
 
             <div className="w-full px-4 mb-4 bg-neutral-50/50 rounded-xl py-2">
               <Image
-                src="/images/jayasri-phonepe-qr-code.png"
+                src="/images/jayasri-phonepe-qr-code-kotak.jpeg"
                 alt="PhonePe QR Code"
                 width={300}
                 height={300}
@@ -91,8 +91,8 @@ export default function BookingInfo() {
                 <span className="text-[10px] sm:text-[11px] leading-tight">{copied ? "Number Copied" : "Copy UPI Number"}</span>
               </button>
               <a
-                href="/images/jayasri-phonepe-qr-code.png"
-                download="Jayasri_Makeovers_QR.png"
+                href="/images/jayasri-phonepe-qr-code-kotak.jpeg"
+                download="Jayasri_Makeovers_Kotak_QR.jpeg"
                 className="flex-1 flex flex-col items-center justify-center gap-1.5 bg-white text-brand-primary border-2 border-brand-primary/20 font-poppins font-semibold px-2 py-3 rounded-xl shadow-sm hover:bg-brand-light/10 active:scale-95 transition-all outline-none"
               >
                 <span className="text-xl">⬇️</span>
