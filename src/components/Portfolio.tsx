@@ -15,12 +15,13 @@ const images: PortfolioImage[] = [
   // Initial few photos are makeup as requested
   { src: "/images/portfolio/bridal-01.webp", category: "hd-bridal" },
   { src: "/images/portfolio/bridal-03.webp", category: "hd-bridal" },
+  { src: "/images/portfolio/bridal-09.webp", category: "hd-bridal" },
   { src: "/images/portfolio/hd-01.webp", category: "hd-bridal" },
   { src: "/images/portfolio/hd-02.webp", category: "hd-bridal" },
   { src: "/images/portfolio/engagement-01.webp", category: "semi-hd" },
   { src: "/images/portfolio/babyshower-03.webp", category: "semi-hd" },
   { src: "/images/portfolio/simple-01.webp", category: "simple" },
-  
+
   // Scattering hairstyle photos in between
   { src: "/images/portfolio/hair-01.webp", category: "hairstyle" },
   { src: "/images/portfolio/hair-12.webp", category: "hairstyle" },
@@ -33,41 +34,41 @@ const images: PortfolioImage[] = [
   { src: "/images/portfolio/hair-16.webp", category: "hairstyle" },
   { src: "/images/portfolio/hair-17.webp", category: "hairstyle" },
   { src: "/images/portfolio/hair-18.webp", category: "hairstyle" },
-  
+
   { src: "/images/portfolio/bridal-02.webp", category: "hd-bridal" },
   { src: "/images/portfolio/babyshower-01.webp", category: "semi-hd" },
   { src: "/images/portfolio/hair-03.webp", category: "hairstyle" },
-  
+
   { src: "/images/portfolio/simple-03.webp", category: "simple" },
   { src: "/images/portfolio/hair-05.webp", category: "hairstyle" },
   { src: "/images/portfolio/simple-04.webp", category: "simple" },
   { src: "/images/portfolio/simple-07.webp", category: "simple" },
   { src: "/images/portfolio/simple-06.webp", category: "simple" },
   { src: "/images/portfolio/semi-hd-01.webp", category: "semi-hd" },
-  
+
   { src: "/images/portfolio/babyshower-02.webp", category: "semi-hd" },
   { src: "/images/portfolio/hair-07.webp", category: "hairstyle" },
-  
+
   { src: "/images/portfolio/simple-05.webp", category: "simple" },
   { src: "/images/portfolio/hair-08.webp", category: "hairstyle" },
-  
+
   { src: "/images/portfolio/hair-09.webp", category: "hairstyle" },
   { src: "/images/portfolio/hair-10.webp", category: "hairstyle" },
   { src: "/images/portfolio/hair-11.webp", category: "hairstyle" },
-  
+
   // Newly added photos
   { src: "/images/portfolio/simple-08.webp", category: "simple" },
   { src: "/images/portfolio/simple-09.webp", category: "simple" },
   { src: "/images/portfolio/simple-10.webp", category: "simple" },
   { src: "/images/portfolio/simple-11.webp", category: "simple" },
   { src: "/images/portfolio/simple-12.webp", category: "simple" },
-  
+
   { src: "/images/portfolio/bridal-04.webp", category: "hd-bridal" },
   { src: "/images/portfolio/bridal-05.webp", category: "hd-bridal" },
   { src: "/images/portfolio/bridal-06.webp", category: "hd-bridal" },
   { src: "/images/portfolio/bridal-07.webp", category: "hd-bridal" },
   { src: "/images/portfolio/bridal-08.webp", category: "hd-bridal" },
-  
+
   { src: "/images/portfolio/hair-19.webp", category: "hairstyle" },
   { src: "/images/portfolio/hair-20.webp", category: "hairstyle" },
   { src: "/images/portfolio/hair-21.webp", category: "hairstyle" },
@@ -89,13 +90,13 @@ export default function Portfolio() {
       return arr;
     };
 
-    const hairImages = images.filter((img) => 
+    const hairImages = images.filter((img) =>
       Array.isArray(img.category) ? img.category.includes("hairstyle") : img.category === "hairstyle"
     );
-    const otherImages = images.filter((img) => 
+    const otherImages = images.filter((img) =>
       Array.isArray(img.category) ? !img.category.includes("hairstyle") : img.category !== "hairstyle"
     );
-    
+
     const shuffledOthers = shuffleArray(otherImages);
     const shuffledHair = shuffleArray(hairImages);
 
@@ -104,7 +105,7 @@ export default function Portfolio() {
     const remainingOthers = shuffledOthers.slice(6);
 
     const remainingMixed = shuffleArray([...remainingOthers, ...shuffledHair]);
-    
+
     setShuffledImages([...firstOthers, ...remainingMixed]);
   }, []);
 
@@ -120,7 +121,7 @@ export default function Portfolio() {
     { id: "hairstyle", labelKey: "portfolio.hairstyle" },
   ];
 
-  const filteredImages = activeTab === "all" ? shuffledImages : shuffledImages.filter(img => 
+  const filteredImages = activeTab === "all" ? shuffledImages : shuffledImages.filter(img =>
     Array.isArray(img.category) ? img.category.includes(activeTab) : img.category === activeTab
   );
 
@@ -177,11 +178,10 @@ export default function Portfolio() {
             onClick={() => {
               setActiveTab(cat.id);
             }}
-            className={`flex-shrink-0 whitespace-nowrap px-5 py-2 rounded-full text-sm font-poppins font-semibold transition-all shadow-sm ${
-              activeTab === cat.id
-                ? "bg-brand-secondary text-white shadow-md scale-105"
-                : "bg-brand-light text-brand-primary border border-brand-secondary/20 hover:bg-brand-secondary/10"
-            }`}
+            className={`flex-shrink-0 whitespace-nowrap px-5 py-2 rounded-full text-sm font-poppins font-semibold transition-all shadow-sm ${activeTab === cat.id
+              ? "bg-brand-secondary text-white shadow-md scale-105"
+              : "bg-brand-light text-brand-primary border border-brand-secondary/20 hover:bg-brand-secondary/10"
+              }`}
           >
             {/* @ts-expect-error valid key */}
             {t(cat.labelKey)}
@@ -192,8 +192,8 @@ export default function Portfolio() {
       {/* Masonry-style Grid (CSS Columns) */}
       <div className="px-6 columns-2 gap-4 space-y-4">
         {filteredImages.map((img, idx) => (
-          <div 
-            key={`${img.src}-${idx}`} 
+          <div
+            key={`${img.src}-${idx}`}
             className="relative w-full rounded-2xl overflow-hidden shadow-sm inline-block group cursor-pointer animate-in fade-in zoom-in duration-500"
             onClick={() => openLightbox(idx)}
           >
@@ -212,32 +212,32 @@ export default function Portfolio() {
                 Jayasri Makeovers
               </p>
             </div>
-             <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+            <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
           </div>
         ))}
       </div>
 
       {/* Lightbox Modal */}
       {lightboxIndex !== null && (
-        <div 
+        <div
           className="fixed inset-y-0 w-full max-w-md left-1/2 -translate-x-1/2 z-[100] bg-black/95 flex items-center justify-center backdrop-blur-md"
           onClick={closeLightbox}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
           {/* Close Button */}
-          <button 
+          <button
             className="absolute top-6 right-6 text-white p-2 z-[110] bg-black/40 rounded-full hover:bg-white/20 transition-colors"
             onClick={(e) => { e.stopPropagation(); closeLightbox(); }}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
           </button>
 
           {/* Swipe hint indicator — shows briefly then fades */}
           <div className="absolute bottom-8 left-0 right-0 flex items-center justify-center gap-3 text-white/50 text-xs pointer-events-none select-none">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
             <span>Swipe to browse</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
           </div>
 
           {/* Position indicator dots */}
@@ -245,26 +245,25 @@ export default function Portfolio() {
             {filteredImages.map((_, idx) => (
               <div
                 key={idx}
-                className={`rounded-full transition-all duration-300 ${
-                  idx === lightboxIndex
-                    ? "w-4 h-2 bg-white"
-                    : "w-2 h-2 bg-white/30"
-                }`}
+                className={`rounded-full transition-all duration-300 ${idx === lightboxIndex
+                  ? "w-4 h-2 bg-white"
+                  : "w-2 h-2 bg-white/30"
+                  }`}
               />
             ))}
           </div>
-          
+
           {/* Prev Button (desktop fallback) */}
-          <button 
+          <button
             className="absolute left-4 top-1/2 -translate-y-1/2 text-white p-3 z-[110] bg-black/40 rounded-full hover:bg-white/20 transition-colors md:flex hidden"
             onClick={prevImage}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
           </button>
-          
+
           {/* Main Image Container */}
           <div className="relative w-full max-w-md h-full px-4 flex items-center justify-center pointer-events-none">
-            <div 
+            <div
               className="relative w-full h-[85vh] pointer-events-auto"
               onContextMenu={(e) => e.preventDefault()}
             >
@@ -286,11 +285,11 @@ export default function Portfolio() {
           </div>
 
           {/* Next Button (desktop fallback) */}
-          <button 
+          <button
             className="absolute right-4 top-1/2 -translate-y-1/2 text-white p-3 z-[110] bg-black/40 rounded-full hover:bg-white/20 transition-colors md:flex hidden"
             onClick={nextImage}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
           </button>
         </div>
       )}
