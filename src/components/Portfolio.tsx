@@ -72,6 +72,10 @@ const images: PortfolioImage[] = [
   { src: "/images/portfolio/hair-19.webp", category: "hairstyle" },
   { src: "/images/portfolio/hair-20.webp", category: "hairstyle" },
   { src: "/images/portfolio/hair-21.webp", category: "hairstyle" },
+  { src: "/images/portfolio/hair-22.webp", category: "hairstyle" },
+  { src: "/images/portfolio/hair-23.webp", category: "hairstyle" },
+  { src: "/images/portfolio/simple-13.webp", category: "simple" },
+  { src: "/images/portfolio/simple-14.webp", category: "simple" },
 ];
 
 export default function Portfolio() {
