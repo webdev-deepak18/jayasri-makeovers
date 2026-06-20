@@ -1,0 +1,17 @@
+name: Supabase Keep Alive
+
+on:
+  schedule:
+    # Run at 09:00 UTC (14:30 IST) every 3 days
+    - cron: '0 9 */3 * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  keep_alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase Database
+        run: |
+          curl -i -X GET "https://deqtivfdoqrjqyxydufg.supabase.co/rest/v1/orders?limit=1" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
