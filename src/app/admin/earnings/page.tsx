@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export default async function EarningsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ month?: string }>;
+  searchParams: Promise<{ month?: string; tab?: string }>;
 }) {
   const months = await getMonthlyEarnings();
   const params = await searchParams;
@@ -71,11 +71,20 @@ export default async function EarningsPage({
   );
 
   // Sort selected orders by date
-  const selectedOrders = [...selected.orders].sort((a, b) => {
+  const sortedSelectedOrders = [...selected.orders].sort((a, b) => {
     const aD = a.date?.split(",")[0]?.trim() ?? "";
     const bD = b.date?.split(",")[0]?.trim() ?? "";
     return aD.localeCompare(bD);
   });
+
+  const selectedOpenOrders = sortedSelectedOrders.filter(o => o.status === "upcoming");
+  const selectedClosedOrders = sortedSelectedOrders.filter(o => o.status === "completed" || o.status === "cancelled");
+
+  // Smart default: open if there are open orders for this month, else closed
+  const defaultOrderTab = selectedOpenOrders.length > 0 ? "open" : "closed";
+  const activeOrderTab = params.tab === "open" || params.tab === "closed" ? params.tab : defaultOrderTab;
+
+  const filteredSelectedOrders = activeOrderTab === "open" ? selectedOpenOrders : selectedClosedOrders;
 
   const isCurrentMonth = selectedMonth === currentMonth;
 
@@ -160,6 +169,25 @@ export default async function EarningsPage({
             </p>
           </div>
         )}
+
+        {/* Integrated All-Time Summary & Best Month */}
+        <div className="mt-4 pt-3 border-t border-white/10 flex justify-between gap-4">
+          <div>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-brand-secondary">Total Earned (All Time)</p>
+            <p className="text-sm font-poppins font-bold">₹{totalAllTime.toLocaleString("en-IN")}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-[9px] font-bold uppercase tracking-widest text-brand-secondary">Best Month</p>
+            {bestMonth.earnings > 0 ? (
+              <p className="text-sm font-poppins font-bold text-emerald-300">
+                ₹{bestMonth.earnings.toLocaleString("en-IN")}{" "}
+                <span className="text-[9px] font-normal text-white/50">({bestMonth.label.split(" ")[0]})</span>
+              </p>
+            ) : (
+              <p className="text-xs text-white/50">—</p>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Month Expenses */}
@@ -172,96 +200,6 @@ export default async function EarningsPage({
           <p className="text-lg font-poppins font-bold text-neutral-600">₹{selected.totalExpenses.toLocaleString("en-IN")}</p>
         </div>
       )}
-
-      {/* Selected Month Orders */}
-      {selectedOrders.length > 0 && (
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-3">
-            Orders in {selected.label}
-          </p>
-          <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden">
-            <div className="divide-y divide-neutral-100">
-              {selectedOrders.map((order) => {
-                const allDates = order.date
-                  ? order.date.split(",").map((d: string) => d.trim()).sort()
-                  : [];
-                const firstDate = allDates[0] ? new Date(allDates[0]) : new Date();
-                const isCompleted = order.status === "completed";
-                const netServicePrice = Number(order.total_price);
-                const advance = Number(order.advance_amount || 0);
-                const netPending = Math.max(0, netServicePrice - advance);
-                const isFullyPaid = netPending <= 0;
-
-                return (
-                  <Link
-                    href={`/admin/orders/${order.id}/edit`}
-                    key={order.id}
-                    className="flex items-center p-4 hover:bg-neutral-50 active:bg-neutral-100 transition-colors"
-                  >
-                    {/* Date badge */}
-                    <div className={`flex-shrink-0 w-12 h-12 flex flex-col items-center justify-center rounded-xl mr-3 ${
-                      isCompleted ? "bg-neutral-100 text-neutral-500" : "bg-brand-light text-brand-primary border border-brand-secondary/20"
-                    }`}>
-                      <span className="text-[9px] font-bold uppercase">{format(firstDate, "MMM")}</span>
-                      <span className="text-base font-poppins font-bold leading-none">{format(firstDate, "dd")}</span>
-                    </div>
-
-                    <div className="flex-grow min-w-0">
-                      <h4 className="font-semibold text-sm text-neutral-900 truncate">{order.client_name}</h4>
-                      <p className="text-[11px] text-neutral-400 truncate">
-                        {getMakeupIcon(order.makeup_type)} {order.makeup_type} · {order.location}
-                      </p>
-                    </div>
-
-                    <div className="flex-shrink-0 text-right ml-2">
-                      {isCompleted || isFullyPaid ? (
-                        <>
-                          <p className="text-sm font-bold text-green-600">₹{netServicePrice.toLocaleString("en-IN")}</p>
-                          <p className="text-[9px] font-semibold text-green-400">fully paid</p>
-                        </>
-                      ) : (
-                        <>
-                          <p className="text-[9px] font-bold text-amber-500 mb-0.5 uppercase tracking-wide">pending</p>
-                          <p className="text-base font-black text-amber-600 leading-none">₹{netPending.toLocaleString("en-IN")}</p>
-                          <p className="text-[9px] font-medium text-neutral-400 mt-1">₹{advance.toLocaleString("en-IN")} adv</p>
-                        </>
-                      )}
-                    </div>
-
-                    <svg className="w-4 h-4 text-neutral-300 ml-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* All-Time Summary */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="bg-white p-4 rounded-2xl shadow-sm border border-neutral-100">
-          <p className="text-[9px] font-bold uppercase tracking-widest text-neutral-400 mb-1">Total Earned</p>
-          <p className="text-xl font-poppins font-bold text-neutral-900 leading-tight">
-            ₹{totalAllTime.toLocaleString("en-IN")}
-          </p>
-          <p className="text-[10px] text-neutral-400 mt-1">All time</p>
-        </div>
-        <div className="bg-white p-4 rounded-2xl shadow-sm border border-neutral-100">
-          <p className="text-[9px] font-bold uppercase tracking-widest text-neutral-400 mb-1">Best Month</p>
-          {bestMonth.earnings > 0 ? (
-            <>
-              <p className="text-xl font-poppins font-bold text-green-600 leading-tight">
-                ₹{bestMonth.earnings.toLocaleString("en-IN")}
-              </p>
-              <p className="text-[10px] text-neutral-400 mt-1 truncate">{bestMonth.label}</p>
-            </>
-          ) : (
-            <p className="text-sm text-neutral-300 mt-1">No data yet</p>
-          )}
-        </div>
-      </div>
 
       {/* 6-Month Bar Chart */}
       <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-4">
@@ -303,6 +241,105 @@ export default async function EarningsPage({
           <p className="text-[9px] text-neutral-300">₹{maxEarnings.toLocaleString("en-IN")}</p>
         </div>
       </div>
+
+      {/* Selected Month Orders */}
+      {sortedSelectedOrders.length > 0 && (
+        <div>
+          <div className="flex items-center justify-between mb-3 gap-2">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
+              Orders in {selected.label}
+            </p>
+            <div className="flex bg-neutral-100 p-0.5 rounded-lg border border-neutral-200">
+              <Link
+                href={`/admin/earnings?month=${selectedMonth}&tab=open`}
+                className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${
+                  activeOrderTab === "open"
+                    ? "bg-white text-brand-primary shadow-sm"
+                    : "text-neutral-500 hover:text-neutral-800"
+                }`}
+              >
+                Open ({selectedOpenOrders.length})
+              </Link>
+              <Link
+                href={`/admin/earnings?month=${selectedMonth}&tab=closed`}
+                className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${
+                  activeOrderTab === "closed"
+                    ? "bg-white text-neutral-700 shadow-sm"
+                    : "text-neutral-500 hover:text-neutral-800"
+                }`}
+              >
+                Closed ({selectedClosedOrders.length})
+              </Link>
+            </div>
+          </div>
+          <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden">
+            {filteredSelectedOrders.length === 0 ? (
+              <div className="p-8 text-center text-neutral-400">
+                <p className="text-3xl mb-1">📋</p>
+                <p className="font-semibold text-neutral-600 text-xs">
+                  No {activeOrderTab} orders
+                </p>
+              </div>
+            ) : (
+              <div className="divide-y divide-neutral-100">
+                {filteredSelectedOrders.map((order) => {
+                  const allDates = order.date
+                    ? order.date.split(",").map((d: string) => d.trim()).sort()
+                    : [];
+                  const firstDate = allDates[0] ? new Date(allDates[0]) : new Date();
+                  const isCompleted = order.status === "completed";
+                  const netServicePrice = Number(order.total_price);
+                  const advance = Number(order.advance_amount || 0);
+                  const netPending = Math.max(0, netServicePrice - advance);
+                  const isFullyPaid = netPending <= 0;
+
+                  return (
+                    <Link
+                      href={`/admin/orders/${order.id}/edit`}
+                      key={order.id}
+                      className="flex items-center p-4 hover:bg-neutral-50 active:bg-neutral-100 transition-colors"
+                    >
+                      {/* Date badge */}
+                      <div className={`flex-shrink-0 w-12 h-12 flex flex-col items-center justify-center rounded-xl mr-3 ${
+                        isCompleted ? "bg-neutral-100 text-neutral-500" : "bg-brand-light text-brand-primary border border-brand-secondary/20"
+                      }`}>
+                        <span className="text-[9px] font-bold uppercase">{format(firstDate, "MMM")}</span>
+                        <span className="text-base font-poppins font-bold leading-none">{format(firstDate, "dd")}</span>
+                      </div>
+
+                      <div className="flex-grow min-w-0">
+                        <h4 className="font-semibold text-sm text-neutral-900 truncate">{order.client_name}</h4>
+                        <p className="text-[11px] text-neutral-400 truncate">
+                          {getMakeupIcon(order.makeup_type)} {order.makeup_type} · {order.location}
+                        </p>
+                      </div>
+
+                      <div className="flex-shrink-0 text-right ml-2">
+                        {isCompleted || isFullyPaid ? (
+                          <>
+                            <p className="text-sm font-bold text-green-600">₹{netServicePrice.toLocaleString("en-IN")}</p>
+                            <p className="text-[9px] font-semibold text-green-400">fully paid</p>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-[9px] font-bold text-amber-500 mb-0.5 uppercase tracking-wide">pending</p>
+                            <p className="text-base font-black text-amber-600 leading-none">₹{netPending.toLocaleString("en-IN")}</p>
+                            <p className="text-[9px] font-medium text-neutral-400 mt-1">₹{advance.toLocaleString("en-IN")} adv</p>
+                          </>
+                        )}
+                      </div>
+
+                      <svg className="w-4 h-4 text-neutral-300 ml-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* All Months List */}
       <div>
