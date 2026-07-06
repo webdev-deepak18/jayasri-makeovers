@@ -25,8 +25,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const tabs = [
     { name: "Home", href: "/admin/dashboard", icon: HomeIcon, iconActive: HomeIconSolid },
-    { name: "Orders", href: "/admin/orders", icon: ClipboardDocumentListIcon, iconActive: ClipboardSolid },
     { name: "Earnings", href: "/admin/earnings", icon: ChartBarIcon, iconActive: ChartBarSolid },
+    { name: "Orders", href: "/admin/orders", icon: ClipboardDocumentListIcon, iconActive: ClipboardSolid },
     { name: "Clients", href: "/admin/clients", icon: UsersIcon, iconActive: UsersSolid },
   ];
 

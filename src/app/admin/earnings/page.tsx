@@ -173,6 +173,72 @@ export default async function EarningsPage({
         </div>
       )}
 
+      {/* Selected Month Orders */}
+      {selectedOrders.length > 0 && (
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-3">
+            Orders in {selected.label}
+          </p>
+          <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden">
+            <div className="divide-y divide-neutral-100">
+              {selectedOrders.map((order) => {
+                const allDates = order.date
+                  ? order.date.split(",").map((d: string) => d.trim()).sort()
+                  : [];
+                const firstDate = allDates[0] ? new Date(allDates[0]) : new Date();
+                const isCompleted = order.status === "completed";
+                const netServicePrice = Number(order.total_price);
+                const advance = Number(order.advance_amount || 0);
+                const netPending = Math.max(0, netServicePrice - advance);
+                const isFullyPaid = netPending <= 0;
+
+                return (
+                  <Link
+                    href={`/admin/orders/${order.id}/edit`}
+                    key={order.id}
+                    className="flex items-center p-4 hover:bg-neutral-50 active:bg-neutral-100 transition-colors"
+                  >
+                    {/* Date badge */}
+                    <div className={`flex-shrink-0 w-12 h-12 flex flex-col items-center justify-center rounded-xl mr-3 ${
+                      isCompleted ? "bg-neutral-100 text-neutral-500" : "bg-brand-light text-brand-primary border border-brand-secondary/20"
+                    }`}>
+                      <span className="text-[9px] font-bold uppercase">{format(firstDate, "MMM")}</span>
+                      <span className="text-base font-poppins font-bold leading-none">{format(firstDate, "dd")}</span>
+                    </div>
+
+                    <div className="flex-grow min-w-0">
+                      <h4 className="font-semibold text-sm text-neutral-900 truncate">{order.client_name}</h4>
+                      <p className="text-[11px] text-neutral-400 truncate">
+                        {getMakeupIcon(order.makeup_type)} {order.makeup_type} · {order.location}
+                      </p>
+                    </div>
+
+                    <div className="flex-shrink-0 text-right ml-2">
+                      {isCompleted || isFullyPaid ? (
+                        <>
+                          <p className="text-sm font-bold text-green-600">₹{netServicePrice.toLocaleString("en-IN")}</p>
+                          <p className="text-[9px] font-semibold text-green-400">fully paid</p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-[9px] font-bold text-amber-500 mb-0.5 uppercase tracking-wide">pending</p>
+                          <p className="text-base font-black text-amber-600 leading-none">₹{netPending.toLocaleString("en-IN")}</p>
+                          <p className="text-[9px] font-medium text-neutral-400 mt-1">₹{advance.toLocaleString("en-IN")} adv</p>
+                        </>
+                      )}
+                    </div>
+
+                    <svg className="w-4 h-4 text-neutral-300 ml-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* All-Time Summary */}
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-white p-4 rounded-2xl shadow-sm border border-neutral-100">
@@ -307,72 +373,6 @@ export default async function EarningsPage({
           )}
         </div>
       </div>
-
-      {/* Selected Month Orders */}
-      {selectedOrders.length > 0 && (
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-3">
-            Orders in {selected.label}
-          </p>
-          <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden">
-            <div className="divide-y divide-neutral-100">
-              {selectedOrders.map((order) => {
-                const allDates = order.date
-                  ? order.date.split(",").map((d: string) => d.trim()).sort()
-                  : [];
-                const firstDate = allDates[0] ? new Date(allDates[0]) : new Date();
-                const isCompleted = order.status === "completed";
-                const netServicePrice = Number(order.total_price);
-                const advance = Number(order.advance_amount || 0);
-                const netPending = Math.max(0, netServicePrice - advance);
-                const isFullyPaid = netPending <= 0;
-
-                return (
-                  <Link
-                    href={`/admin/orders/${order.id}/edit`}
-                    key={order.id}
-                    className="flex items-center p-4 hover:bg-neutral-50 active:bg-neutral-100 transition-colors"
-                  >
-                    {/* Date badge */}
-                    <div className={`flex-shrink-0 w-12 h-12 flex flex-col items-center justify-center rounded-xl mr-3 ${
-                      isCompleted ? "bg-neutral-100 text-neutral-500" : "bg-brand-light text-brand-primary border border-brand-secondary/20"
-                    }`}>
-                      <span className="text-[9px] font-bold uppercase">{format(firstDate, "MMM")}</span>
-                      <span className="text-base font-poppins font-bold leading-none">{format(firstDate, "dd")}</span>
-                    </div>
-
-                    <div className="flex-grow min-w-0">
-                      <h4 className="font-semibold text-sm text-neutral-900 truncate">{order.client_name}</h4>
-                      <p className="text-[11px] text-neutral-400 truncate">
-                        {getMakeupIcon(order.makeup_type)} {order.makeup_type} · {order.location}
-                      </p>
-                    </div>
-
-                    <div className="flex-shrink-0 text-right ml-2">
-                      {isCompleted || isFullyPaid ? (
-                        <>
-                          <p className="text-sm font-bold text-green-600">₹{netServicePrice.toLocaleString("en-IN")}</p>
-                          <p className="text-[9px] font-semibold text-green-400">fully paid</p>
-                        </>
-                      ) : (
-                        <>
-                          <p className="text-[9px] font-bold text-amber-500 mb-0.5 uppercase tracking-wide">pending</p>
-                          <p className="text-base font-black text-amber-600 leading-none">₹{netPending.toLocaleString("en-IN")}</p>
-                          <p className="text-[9px] font-medium text-neutral-400 mt-1">₹{advance.toLocaleString("en-IN")} adv</p>
-                        </>
-                      )}
-                    </div>
-
-                    <svg className="w-4 h-4 text-neutral-300 ml-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

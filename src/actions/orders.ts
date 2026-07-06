@@ -1,7 +1,7 @@
 "use server";
 
 import { supabase } from "@/lib/supabase";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag, unstable_cache } from "next/cache";
 
 // Type definitions based on our schema
 export type OrderStatus = "upcoming" | "completed" | "cancelled";
@@ -24,13 +24,23 @@ export interface DashboardStats {
   completedOrders: any[];  // closed, sorted by date desc
 }
 
+// Cached fetcher for all orders to make page transitions and queries instantaneous
+export const getAllOrdersCached = unstable_cache(
+  async () => {
+    const { data, error } = await supabase.from("orders").select("*");
+    if (error) throw new Error(error.message);
+    return data || [];
+  },
+  ["all-orders"],
+  { tags: ["orders"] }
+);
+
 export async function getDashboardStats(): Promise<DashboardStats> {
   const today = new Date();
   const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
   const firstDayOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-  const todayStr = today.toISOString().split('T')[0];
 
-  const { data: allOrders } = await supabase.from("orders").select("*");
+  const allOrders = await getAllOrdersCached();
 
   let totalEarned = 0;
   let pendingToCollect = 0;
@@ -43,60 +53,55 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   let upcomingList: any[] = [];
   let completedList: any[] = [];
 
-  if (allOrders) {
-    allOrders.forEach(o => {
-      const advance = Number(o.advance_amount || 0);
-      const total = Number(o.total_price || 0);
-      const travel = Number(o.travel_expense || 0);
-      const other = Number(o.other_expenses || 0);
-      
-      cashCollected += advance;
-      totalTravelExpense += travel;
-      totalOtherExpense += other;
+  allOrders.forEach(o => {
+    const advance = Number(o.advance_amount || 0);
+    const total = Number(o.total_price || 0);
+    const travel = Number(o.travel_expense || 0);
+    const other = Number(o.other_expenses || 0);
+    
+    cashCollected += advance;
+    totalTravelExpense += travel;
+    totalOtherExpense += other;
 
-      const dates = o.date ? o.date.split(',').map((d: string) => d.trim()).sort() : [];
-      const firstDate = dates[0] || '';
-      const lastDate = dates[dates.length - 1] || '';
+    const dates = o.date ? o.date.split(',').map((d: string) => d.trim()).sort() : [];
+    const firstDate = dates[0] || '';
 
-      if (o.status === 'completed') {
-        // Completed: service price minus pass-throughs
-        const serviceEarned = total - travel - other;
-        totalEarned += serviceEarned;
-        completedOrdersCount++;
-        completedList.push(o);
+    if (o.status === 'completed') {
+      // Completed: service price minus pass-throughs
+      const serviceEarned = total - travel - other;
+      totalEarned += serviceEarned;
+      completedOrdersCount++;
+      completedList.push(o);
 
-        // This month (completed events this month)
-        if (firstDate >= firstDayOfMonth.toISOString().split('T')[0] &&
-            firstDate < firstDayOfNextMonth.toISOString().split('T')[0]) {
-          earningsThisMonth += serviceEarned;
-        }
-      } else if (o.status === 'upcoming') {
-        // Upcoming: only the advance is earned so far
-        // Pending = NET service price still to collect (total minus expenses minus advance)
-        const netServicePrice = total - travel - other;
-        totalEarned += advance;
-        pendingToCollect += Math.max(0, netServicePrice - advance);
-
-        if (lastDate >= todayStr) {
-          openOrdersCount++;
-          upcomingList.push(o);
-        }
-
-        // This month (upcoming events this month — count advance)
-        if (firstDate >= firstDayOfMonth.toISOString().split('T')[0] &&
-            firstDate < firstDayOfNextMonth.toISOString().split('T')[0]) {
-          earningsThisMonth += advance;
-        }
+      // This month (completed events this month)
+      if (firstDate >= firstDayOfMonth.toISOString().split('T')[0] &&
+          firstDate < firstDayOfNextMonth.toISOString().split('T')[0]) {
+        earningsThisMonth += serviceEarned;
       }
-    });
+    } else if (o.status === 'upcoming') {
+      // Upcoming: only the advance is earned so far
+      // Pending = NET service price still to collect (total minus expenses minus advance)
+      const netServicePrice = total - travel - other;
+      totalEarned += advance;
+      pendingToCollect += Math.max(0, netServicePrice - advance);
 
-    upcomingList.sort((a, b) =>
-      (a.date.split(',')[0].trim()).localeCompare(b.date.split(',')[0].trim())
-    );
-    completedList.sort((a, b) =>
-      (b.date.split(',')[0].trim()).localeCompare(a.date.split(',')[0].trim())
-    );
-  }
+      openOrdersCount++;
+      upcomingList.push(o);
+
+      // This month (upcoming events this month — count advance)
+      if (firstDate >= firstDayOfMonth.toISOString().split('T')[0] &&
+          firstDate < firstDayOfNextMonth.toISOString().split('T')[0]) {
+        earningsThisMonth += advance;
+      }
+    }
+  });
+
+  upcomingList.sort((a, b) =>
+    (a.date.split(',')[0].trim()).localeCompare(b.date.split(',')[0].trim())
+  );
+  completedList.sort((a, b) =>
+    (b.date.split(',')[0].trim()).localeCompare(a.date.split(',')[0].trim())
+  );
 
   return {
     totalEarned,
@@ -113,17 +118,15 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 }
 
 export async function getOrders(statusFilter?: string) {
-  let query = supabase.from("orders").select("*");
+  const allOrders = await getAllOrdersCached();
   
+  let filtered = allOrders;
   if (statusFilter && statusFilter !== "all") {
-    query = query.eq("status", statusFilter);
+    filtered = allOrders.filter(o => o.status === statusFilter);
   }
 
-  const { data, error } = await query;
-  if (error) throw new Error(error.message);
-  
   // Sort in JS because of comma separated string format
-  const sorted = (data || []).sort((a, b) => {
+  const sorted = [...filtered].sort((a, b) => {
     const aFirst = a.date?.split(',')[0].trim() || "0000";
     const bFirst = b.date?.split(',')[0].trim() || "0000";
     return bFirst.localeCompare(aFirst); // descending
@@ -133,28 +136,27 @@ export async function getOrders(statusFilter?: string) {
 }
 
 export async function getClients() {
-  // Get unique clients by name + phone
-  const { data, error } = await supabase
-    .from("orders")
-    .select("client_name, phone_number, location, created_at")
-    .order("created_at", { ascending: false });
+  const allOrders = await getAllOrdersCached();
 
-  if (error) throw new Error(error.message);
-  if (!data) return [];
+  // Sort in descending order of created_at
+  const sorted = [...allOrders].sort((a, b) => 
+    new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+  );
   
-  // Deduplicate
-  const uniquePhones = Array.from(new Set(data.map(c => c.phone_number)));
+  // Deduplicate by phone_number
+  const uniquePhones = Array.from(new Set(sorted.map(c => c.phone_number)));
   const uniqueClients = uniquePhones.map(phone => {
-    return data.find(c => c.phone_number === phone)!;
+    return sorted.find(c => c.phone_number === phone)!;
   });
 
   return uniqueClients;
 }
 
 export async function getOrderById(id: string) {
-  const { data, error } = await supabase.from("orders").select("*").eq("id", id).single();
-  if (error) throw new Error(error.message);
-  return data;
+  const allOrders = await getAllOrdersCached();
+  const order = allOrders.find(o => String(o.id) === String(id));
+  if (!order) throw new Error("Order not found");
+  return order;
 }
 
 export async function createOrder(formData: FormData) {
@@ -176,6 +178,7 @@ export async function createOrder(formData: FormData) {
   const { error } = await supabase.from("orders").insert([orderData]);
   if (error) return { success: false, error: error.message };
 
+  updateTag("orders");
   revalidatePath("/", "layout"); // Bust all cache to update calendar & dashboard
   return { success: true };
 }
@@ -199,6 +202,7 @@ export async function updateOrder(id: string, formData: FormData) {
   const { error } = await supabase.from("orders").update(orderData).eq("id", id);
   if (error) return { success: false, error: error.message };
 
+  updateTag("orders");
   revalidatePath("/", "layout");
   return { success: true };
 }
@@ -207,20 +211,17 @@ export async function deleteOrder(id: string) {
   const { error } = await supabase.from("orders").delete().eq("id", id);
   if (error) return { success: false, error: error.message };
 
+  updateTag("orders");
   revalidatePath("/", "layout");
   return { success: true };
 }
 
 /** Mark an order complete + optionally add balance received on event day */
 export async function quickCompleteOrder(id: string, balanceReceived: number) {
-  // Fetch current advance to add the balance on top
-  const { data: order, error: fetchErr } = await supabase
-    .from("orders")
-    .select("advance_amount, total_price")
-    .eq("id", id)
-    .single();
+  const allOrders = await getAllOrdersCached();
+  const order = allOrders.find(o => String(o.id) === String(id));
 
-  if (fetchErr || !order) return { success: false, error: "Order not found" };
+  if (!order) return { success: false, error: "Order not found" };
 
   const newAdvance = Number(order.advance_amount) + balanceReceived;
 
@@ -231,10 +232,10 @@ export async function quickCompleteOrder(id: string, balanceReceived: number) {
 
   if (error) return { success: false, error: error.message };
 
+  updateTag("orders");
   revalidatePath("/", "layout");
   return { success: true };
 }
-
 
 export interface MonthEarnings {
   /** e.g. "2026-04" */
@@ -257,7 +258,7 @@ export interface MonthEarnings {
  * Months with zero earnings are still included.
  */
 export async function getMonthlyEarnings(): Promise<MonthEarnings[]> {
-  const { data: allOrders } = await supabase.from("orders").select("*");
+  const allOrders = await getAllOrdersCached();
   if (!allOrders || allOrders.length === 0) return [];
 
   // Build a map: "YYYY-MM" -> accumulated data
@@ -334,14 +335,10 @@ export async function getMonthlyEarnings(): Promise<MonthEarnings[]> {
 }
 
 export async function getPublicBookedDates() {
-  const { data } = await supabase
-    .from("orders")
-    .select("date")
-    .neq("status", "cancelled");
-    
-  if (!data) return [];
+  const allOrders = await getAllOrdersCached();
+  const activeOrders = allOrders.filter(o => o.status !== "cancelled");
   
-  const allDates = data.flatMap(o => {
+  const allDates = activeOrders.flatMap(o => {
     if (!o.date) return [];
     return o.date.split(',').map((d: string) => d.trim());
   });
