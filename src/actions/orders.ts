@@ -335,7 +335,14 @@ export async function getMonthlyEarnings(): Promise<MonthEarnings[]> {
 }
 
 export async function getPublicBookedDates() {
-  const allOrders = await getAllOrdersCached();
+  // Public homepage must not crash if Supabase is unreachable; just show no booked dates
+  let allOrders: any[];
+  try {
+    allOrders = await getAllOrdersCached();
+  } catch (e) {
+    console.error("getPublicBookedDates failed:", e);
+    return [];
+  }
   const activeOrders = allOrders.filter(o => o.status !== "cancelled");
   
   const allDates = activeOrders.flatMap(o => {
