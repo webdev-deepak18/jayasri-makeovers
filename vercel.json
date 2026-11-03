@@ -1,4 +1,5 @@
 {
+  "ignoreCommand": "git diff --quiet ${VERCEL_GIT_PREVIOUS_SHA:-HEAD^} HEAD -- src public package.json package-lock.json next.config.ts tsconfig.json postcss.config.mjs vercel.json || exit 1",
   "crons": [
     {
       "path": "/api/keep-alive",
